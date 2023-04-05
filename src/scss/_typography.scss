@@ -1,0 +1,41 @@
+@import "../scss/_variables";
+
+body { 
+    font-family: $main-font;
+    font-size: $fs-sm;
+    font-weight: 400;
+    color: $color1;
+}
+h2 {
+	font-family: "_officina_sans";
+	text-transform: uppercase;
+	@include transition(color);
+	&:hover {
+		opacity: .8;
+	}
+}
+h3 {
+	font-family: $third-font;
+	font-size: $fs-md;
+	color: $color7;
+	margin-bottom: 20px;
+}
+h4 {
+	font-family: $secondary-font;
+	font-size: 14px;
+	text-transform: uppercase;
+	color: $color2;
+}
+h5 {
+	font-family: $secondary-font;
+	font-size: $fs-md;
+	color: $color2;
+}
+h6 {
+	font-family: $third-font;
+	font-size: $fs-md;
+	color: $color5;
+}
+a {
+    color: $color2
+}
