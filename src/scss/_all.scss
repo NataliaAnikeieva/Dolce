@@ -99,7 +99,6 @@ html,body {
 .main__content {
 	display: flex;  
 	justify-content: space-between;
-	flex-flow: row wrap;
 	text-align: center; 
 	background-color: $color2;
 	padding: 25px 40px 80px 25px;
@@ -109,7 +108,6 @@ html,body {
 	display: flex;
 	flex-direction: column;
 	text-align: start;
-	width: 24%;
 	background-color: $color8;
 	padding: 15px 15px;
 }
