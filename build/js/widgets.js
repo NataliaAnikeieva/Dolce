@@ -1,2703 +1,2316 @@
-/*
- * jQuery desktopDropNav plugin - prepare desktop nav for usage with Accordion plugin
- */
-(function ($) {
-	$.fn.desktopDropNav = function (o) {
-		// default options
-		var options = $.extend(
-			{
-				openCloseClass: 'open-close',
-				openerClass: 'opener',
-				slideClass: 'slide',
-			},
-			o
-		);
-
-		return this.each(function () {
-			if (!!$(this).find('ul').length) {
-				$(this)
-					.find('ul')
-					.each(function () {
-						var elemParent = $(this).closest('li');
-
-						elemParent
-							.addClass(options.openCloseClass)
-							.children('div')
-							.addClass(options.slideClass);
-						createBlock('<span>', options.openerClass, elemParent.children('a'));
-					});
-			}
-		});
-
-		function createBlock(element, className, place) {
-			$(element).addClass(className).appendTo(place);
-		}
-	};
-})(jQuery);
-
-/*
- * jQuery Accordion plugin
- */
-(function ($) {
-	$.fn.slideAccordion = function (opt) {
-		// default options
-		var options = $.extend(
-			{
-				addClassBeforeAnimation: false,
-				allowClickWhenExpanded: false,
-				activeClass: 'active',
-				opener: '.opener',
-				slider: '.slide',
-				animSpeed: 300,
-				collapsible: true,
-				closeInactive: false,
-				event: 'click',
-			},
-			opt
-		);
-
-		return this.each(function () {
-			// options
-			var accordion = $(this);
-			var items = accordion.find(':has(' + options.slider + ')');
-
-			items.each(function () {
-				var item = $(this);
-				var opener = item.find(options.opener);
-				var slider = item.find(options.slider);
-				opener.bind(options.event, function (e) {
-					if (!slider.is(':animated')) {
-						if (item.hasClass(options.activeClass)) {
-							if (options.allowClickWhenExpanded) {
-								return;
-							} else if (options.collapsible) {
-								slider.slideUp(options.animSpeed, function () {
-									hideSlide(slider);
-									item.removeClass(options.activeClass);
-								});
-							}
-						} else {
-							// show active
-							var levelItems = item.siblings('.' + options.activeClass);
-							var sliderElements = levelItems.find(options.slider);
-							item.addClass(options.activeClass);
-							showSlide(slider).hide().slideDown(options.animSpeed);
-
-							// collapse others
-							if (options.closeInactive) {
-								sliderElements.slideUp(options.animSpeed, function () {
-									levelItems.removeClass(options.activeClass);
-									hideSlide(sliderElements);
-								});
-							}
-						}
-					}
-					e.preventDefault();
-				});
-				if (item.hasClass(options.activeClass)) showSlide(slider);
-				else hideSlide(slider);
-			});
-		});
-	};
-
-	// accordion slide visibility
-	var showSlide = function (slide) {
-		return slide.css({ position: '', top: '', left: '', width: '' });
-	};
-	var hideSlide = function (slide) {
-		return slide
-			.show()
-			.css({
-				position: 'absolute',
-				top: -9999,
-				left: -9999,
-				width: slide.width(),
-			});
-	};
-})(jQuery);
-
-// check if drop down fits in main parent container, and add class if it doesn't
-// !IMPORTANT: works only with first drop down level
-(function ($) {
-	// options
-	function dropdownFit(options) {
-		this.options = $.extend(
-			{
-				dropDown: '>li>ul',
-				fitClass: 'set-right',
-			},
-			options
-		);
-
-		this.init();
+(function (factory) {
+	'use strict';
+	if (typeof define === 'function' && define.amd) {
+		define(['jquery'], factory);
+	} else if (typeof exports !== 'undefined') {
+		module.exports = factory(require('jquery'));
+	} else {
+		factory(jQuery);
 	}
-
-	// prototype
-	dropdownFit.prototype = {
-		init: function () {
-			this.findElements();
-			this.detectOffset();
-		},
-		findElements: function () {
-			(this.holder = $(this.options.holder)),
-				(this.dropdown = this.holder.find(this.options.dropDown)),
-				(this.dropdownParent = this.dropdown.parents('li'));
-		},
-		detectOffset: function () {
-			var self = this,
-				holderWidth = self.holder.width(),
-				holderOffset = self.holder.offset().left;
-
-			self.dropdownParent.each(function () {
-				if (Math.round($(this).offset().left) >= holderOffset) {
-					var test =
-						Math.round($(this).offset().left) - holderOffset + self.dropdown.width();
-					if (holderWidth <= test) {
-						$(this).addClass(self.options.fitClass);
-					}
-				}
-			});
-		},
-		destroy: function () {
-			this.dropdownParent.removeClass(this.options.fitClass);
-			this.holder.removeData('dropdownFit');
-		},
-	};
-
-	// jquery plugin
-	$.fn.dropdownFit = function (opt) {
-		return this.each(function () {
-			$(this).data(
-				'dropdownFit',
-				new dropdownFit($.extend(opt, { holder: this }))
-			);
-		});
-	};
-})(jQuery);
-
-/*
- * jQuery mmenu v5.6.4
- * @requires jQuery 1.7.0 or later
- *
- * mmenu.frebsite.nl
- *
- * Copyright (c) Fred Heusschen
- * www.frebsite.nl
- *
- * License: CC-BY-NC-4.0
- * http://creativecommons.org/licenses/by-nc/4.0/
- */
-!(function (e) {
-	function t() {
-		e[n].glbl ||
-			((r = {
-				$wndw: e(window),
-				$docu: e(document),
-				$html: e('html'),
-				$body: e('body'),
-			}),
-			(i = {}),
-			(a = {}),
-			(o = {}),
-			e.each([i, a, o], function (e, t) {
-				t.add = function (e) {
-					e = e.split(' ');
-					for (var n = 0, s = e.length; s > n; n++) t[e[n]] = t.mm(e[n]);
-				};
-			}),
-			(i.mm = function (e) {
-				return 'mm-' + e;
-			}),
-			i.add(
-				'wrapper menu panels panel nopanel current highest opened subopened navbar hasnavbar title btn prev next listview nolistview inset vertical selected divider spacer hidden fullsubopen'
-			),
-			(i.umm = function (e) {
-				return 'mm-' == e.slice(0, 3) && (e = e.slice(3)), e;
-			}),
-			(a.mm = function (e) {
-				return 'mm-' + e;
-			}),
-			a.add('parent sub'),
-			(o.mm = function (e) {
-				return e + '.mm';
-			}),
-			o.add(
-				'transitionend webkitTransitionEnd click scroll keydown mousedown mouseup touchstart touchmove touchend orientationchange'
-			),
-			(e[n]._c = i),
-			(e[n]._d = a),
-			(e[n]._e = o),
-			(e[n].glbl = r));
-	}
-	var n = 'mmenu',
-		s = '5.6.4';
-	if (!(e[n] && e[n].version > s)) {
-		(e[n] = function (e, t, n) {
-			(this.$menu = e),
-				(this._api = [
-					'bind',
-					'init',
-					'update',
-					'setSelected',
-					'getInstance',
-					'openPanel',
-					'closePanel',
-					'closeAllPanels',
-				]),
-				(this.opts = t),
-				(this.conf = n),
-				(this.vars = {}),
-				(this.cbck = {}),
-				'function' == typeof this.___deprecated && this.___deprecated(),
-				this._initMenu(),
-				this._initAnchors();
-			var s = this.$pnls.children();
-			return (
-				this._initAddons(),
-				this.init(s),
-				'function' == typeof this.___debug && this.___debug(),
-				this
-			);
-		}),
-			(e[n].version = s),
-			(e[n].addons = {}),
-			(e[n].uniqueId = 0),
-			(e[n].defaults = {
-				extensions: [],
-				navbar: { add: !0, title: 'Menu', titleLink: 'panel' },
-				onClick: { setSelected: !0 },
-				slidingSubmenus: !0,
-			}),
-			(e[n].configuration = {
-				classNames: {
-					divider: 'Divider',
-					inset: 'Inset',
-					panel: 'Panel',
-					selected: 'Selected',
-					spacer: 'Spacer',
-					vertical: 'Vertical',
+})(function ($) {
+	'use strict';
+	var Slick = window.Slick || {};
+	Slick = (function () {
+		var instanceUid = 0;
+		function Slick(element, settings) {
+			var _ = this,
+				dataSettings;
+			_.defaults = {
+				accessibility: true,
+				adaptiveHeight: false,
+				appendArrows: $(element),
+				appendDots: $(element),
+				arrows: true,
+				asNavFor: null,
+				prevArrow:
+					'<button class="slick-prev" aria-label="Previous" type="button">Previous</button>',
+				nextArrow:
+					'<button class="slick-next" aria-label="Next" type="button">Next</button>',
+				autoplay: false,
+				autoplaySpeed: 3e3,
+				centerMode: false,
+				centerPadding: '50px',
+				cssEase: 'ease',
+				customPaging: function (slider, i) {
+					return $('<button type="button" />').text(i + 1);
 				},
-				clone: !1,
-				openingInterval: 25,
-				panelNodetype: 'ul, ol, div',
-				transitionDuration: 400,
-			}),
-			(e[n].prototype = {
-				init: function (e) {
-					(e = e.not('.' + i.nopanel)),
-						(e = this._initPanels(e)),
-						this.trigger('init', e),
-						this.trigger('update');
-				},
-				update: function () {
-					this.trigger('update');
-				},
-				setSelected: function (e) {
-					this.$menu
-						.find('.' + i.listview)
-						.children()
-						.removeClass(i.selected),
-						e.addClass(i.selected),
-						this.trigger('setSelected', e);
-				},
-				openPanel: function (t) {
-					var s = t.parent(),
-						a = this;
-					if (s.hasClass(i.vertical)) {
-						var o = s.parents('.' + i.subopened);
-						if (o.length) return void this.openPanel(o.first());
-						s.addClass(i.opened),
-							this.trigger('openPanel', t),
-							this.trigger('openingPanel', t),
-							this.trigger('openedPanel', t);
-					} else {
-						if (t.hasClass(i.current)) return;
-						var r = this.$pnls.children('.' + i.panel),
-							l = r.filter('.' + i.current);
-						r
-							.removeClass(i.highest)
-							.removeClass(i.current)
-							.not(t)
-							.not(l)
-							.not('.' + i.vertical)
-							.addClass(i.hidden),
-							e[n].support.csstransitions || l.addClass(i.hidden),
-							t.hasClass(i.opened)
-								? t
-										.nextAll('.' + i.opened)
-										.addClass(i.highest)
-										.removeClass(i.opened)
-										.removeClass(i.subopened)
-								: (t.addClass(i.highest), l.addClass(i.subopened)),
-							t.removeClass(i.hidden).addClass(i.current),
-							a.trigger('openPanel', t),
-							setTimeout(function () {
-								t.removeClass(i.subopened).addClass(i.opened),
-									a.trigger('openingPanel', t),
-									a.__transitionend(
-										t,
-										function () {
-											a.trigger('openedPanel', t);
-										},
-										a.conf.transitionDuration
-									);
-							}, this.conf.openingInterval);
-					}
-				},
-				closePanel: function (e) {
-					var t = e.parent();
-					t.hasClass(i.vertical) &&
-						(t.removeClass(i.opened),
-						this.trigger('closePanel', e),
-						this.trigger('closingPanel', e),
-						this.trigger('closedPanel', e));
-				},
-				closeAllPanels: function () {
-					this.$menu
-						.find('.' + i.listview)
-						.children()
-						.removeClass(i.selected)
-						.filter('.' + i.vertical)
-						.removeClass(i.opened);
-					var e = this.$pnls.children('.' + i.panel),
-						t = e.first();
-					this.$pnls
-						.children('.' + i.panel)
-						.not(t)
-						.removeClass(i.subopened)
-						.removeClass(i.opened)
-						.removeClass(i.current)
-						.removeClass(i.highest)
-						.addClass(i.hidden),
-						this.openPanel(t);
-				},
-				togglePanel: function (e) {
-					var t = e.parent();
-					t.hasClass(i.vertical) &&
-						this[t.hasClass(i.opened) ? 'closePanel' : 'openPanel'](e);
-				},
-				getInstance: function () {
-					return this;
-				},
-				bind: function (e, t) {
-					(this.cbck[e] = this.cbck[e] || []), this.cbck[e].push(t);
-				},
-				trigger: function () {
-					var e = this,
-						t = Array.prototype.slice.call(arguments),
-						n = t.shift();
-					if (this.cbck[n])
-						for (var s = 0, i = this.cbck[n].length; i > s; s++)
-							this.cbck[n][s].apply(e, t);
-				},
-				_initMenu: function () {
-					this.$menu.attr('id', this.$menu.attr('id') || this.__getUniqueId()),
-						this.conf.clone &&
-							((this.$menu = this.$menu.clone(!0)),
-							this.$menu
-								.add(this.$menu.find('[id]'))
-								.filter('[id]')
-								.each(function () {
-									e(this).attr('id', i.mm(e(this).attr('id')));
-								})),
-						this.$menu.contents().each(function () {
-							3 == e(this)[0].nodeType && e(this).remove();
-						}),
-						(this.$pnls = e('<div class="' + i.panels + '" />')
-							.append(this.$menu.children(this.conf.panelNodetype))
-							.prependTo(this.$menu)),
-						this.$menu.parent().addClass(i.wrapper);
-					var t = [i.menu];
-					this.opts.slidingSubmenus || t.push(i.vertical),
-						(this.opts.extensions = this.opts.extensions.length
-							? 'mm-' + this.opts.extensions.join(' mm-')
-							: ''),
-						this.opts.extensions && t.push(this.opts.extensions),
-						this.$menu.addClass(t.join(' '));
-				},
-				_initPanels: function (t) {
-					var n = this,
-						s = this.__findAddBack(t, 'ul, ol');
-					this.__refactorClass(s, this.conf.classNames.inset, 'inset').addClass(
-						i.nolistview + ' ' + i.nopanel
-					),
-						s.not('.' + i.nolistview).addClass(i.listview);
-					var o = this.__findAddBack(t, '.' + i.listview).children();
-					this.__refactorClass(o, this.conf.classNames.selected, 'selected'),
-						this.__refactorClass(o, this.conf.classNames.divider, 'divider'),
-						this.__refactorClass(o, this.conf.classNames.spacer, 'spacer'),
-						this.__refactorClass(
-							this.__findAddBack(t, '.' + this.conf.classNames.panel),
-							this.conf.classNames.panel,
-							'panel'
-						);
-					var r = e(),
-						l = t
-							.add(t.find('.' + i.panel))
-							.add(
-								this.__findAddBack(t, '.' + i.listview)
-									.children()
-									.children(this.conf.panelNodetype)
-							)
-							.not('.' + i.nopanel);
-					this.__refactorClass(l, this.conf.classNames.vertical, 'vertical'),
-						this.opts.slidingSubmenus || l.addClass(i.vertical),
-						l.each(function () {
-							var t = e(this),
-								s = t;
-							t.is('ul, ol')
-								? (t.wrap('<div class="' + i.panel + '" />'), (s = t.parent()))
-								: s.addClass(i.panel);
-							var a = t.attr('id');
-							t.removeAttr('id'),
-								s.attr('id', a || n.__getUniqueId()),
-								t.hasClass(i.vertical) &&
-									(t.removeClass(n.conf.classNames.vertical),
-									s.add(s.parent()).addClass(i.vertical)),
-								(r = r.add(s));
-						});
-					var d = e('.' + i.panel, this.$menu);
-					r.each(function (t) {
-						var s,
-							o,
-							r = e(this),
-							l = r.parent(),
-							d = l.children('a, span').first();
-						if (
-							(l.is('.' + i.panels) || (l.data(a.sub, r), r.data(a.parent, l)),
-							l.children('.' + i.next).length ||
-								(l.parent().is('.' + i.listview) &&
-									((s = r.attr('id')),
-									(o = e(
-										'<a class="' +
-											i.next +
-											'" href="#' +
-											s +
-											'" data-target="#' +
-											s +
-											'" />'
-									).insertBefore(d)),
-									d.is('span') && o.addClass(i.fullsubopen))),
-							!r.children('.' + i.navbar).length && !l.hasClass(i.vertical))
-						) {
-							l.parent().is('.' + i.listview)
-								? (l = l.closest('.' + i.panel))
-								: ((d = l
-										.closest('.' + i.panel)
-										.find('a[href="#' + r.attr('id') + '"]')
-										.first()),
-								  (l = d.closest('.' + i.panel)));
-							var c = !1,
-								h = e('<div class="' + i.navbar + '" />');
-							if (l.length) {
-								switch (((s = l.attr('id')), n.opts.navbar.titleLink)) {
-									case 'anchor':
-										c = d.attr('href');
-										break;
-									case 'panel':
-									case 'parent':
-										c = '#' + s;
-										break;
-									default:
-										c = !1;
-								}
-								h
-									.append(
-										'<a class="' +
-											i.btn +
-											' ' +
-											i.prev +
-											'" href="#' +
-											s +
-											'" data-target="#' +
-											s +
-											'" />'
-									)
-									.append(
-										e(
-											'<a class="' + i.title + '"' + (c ? ' href="' + c + '"' : '') + ' />'
-										).text(d.text())
-									)
-									.prependTo(r),
-									n.opts.navbar.add && r.addClass(i.hasnavbar);
-							} else
-								n.opts.navbar.title &&
-									(h
-										.append('<a class="' + i.title + '">' + n.opts.navbar.title + '</a>')
-										.prependTo(r),
-									n.opts.navbar.add && r.addClass(i.hasnavbar));
-						}
-					});
-					var c = this.__findAddBack(t, '.' + i.listview)
-						.children('.' + i.selected)
-						.removeClass(i.selected)
-						.last()
-						.addClass(i.selected);
-					c
-						.add(c.parentsUntil('.' + i.menu, 'li'))
-						.filter('.' + i.vertical)
-						.addClass(i.opened)
-						.end()
-						.each(function () {
-							e(this)
-								.parentsUntil('.' + i.menu, '.' + i.panel)
-								.not('.' + i.vertical)
-								.first()
-								.addClass(i.opened)
-								.parentsUntil('.' + i.menu, '.' + i.panel)
-								.not('.' + i.vertical)
-								.first()
-								.addClass(i.opened)
-								.addClass(i.subopened);
-						}),
-						c
-							.children('.' + i.panel)
-							.not('.' + i.vertical)
-							.addClass(i.opened)
-							.parentsUntil('.' + i.menu, '.' + i.panel)
-							.not('.' + i.vertical)
-							.first()
-							.addClass(i.opened)
-							.addClass(i.subopened);
-					var h = d.filter('.' + i.opened);
-					return (
-						h.length || (h = r.first()),
-						h.addClass(i.opened).last().addClass(i.current),
-						r
-							.not('.' + i.vertical)
-							.not(h.last())
-							.addClass(i.hidden)
-							.end()
-							.filter(function () {
-								return !e(this).parent().hasClass(i.panels);
-							})
-							.appendTo(this.$pnls),
-						r
-					);
-				},
-				_initAnchors: function () {
-					var t = this;
-					r.$body.on(o.click + '-oncanvas', 'a[href]', function (s) {
-						var a = e(this),
-							o = !1,
-							r = t.$menu.find(a).length;
-						for (var l in e[n].addons)
-							if (e[n].addons[l].clickAnchor.call(t, a, r)) {
-								o = !0;
-								break;
-							}
-						var d = a.attr('href');
-						if (!o && r && d.length > 1 && '#' == d.slice(0, 1))
-							try {
-								var c = e(d, t.$menu);
-								c.is('.' + i.panel) &&
-									((o = !0),
-									t[a.parent().hasClass(i.vertical) ? 'togglePanel' : 'openPanel'](c));
-							} catch (h) {}
-						if (
-							(o && s.preventDefault(),
-							!o &&
-								r &&
-								a.is('.' + i.listview + ' > li > a') &&
-								!a.is('[rel="external"]') &&
-								!a.is('[target="_blank"]'))
-						) {
-							t.__valueOrFn(t.opts.onClick.setSelected, a) &&
-								t.setSelected(e(s.target).parent());
-							var u = t.__valueOrFn(
-								t.opts.onClick.preventDefault,
-								a,
-								'#' == d.slice(0, 1)
-							);
-							u && s.preventDefault(),
-								t.__valueOrFn(t.opts.onClick.close, a, u) && t.close();
-						}
-					});
-				},
-				_initAddons: function () {
-					var t;
-					for (t in e[n].addons)
-						e[n].addons[t].add.call(this), (e[n].addons[t].add = function () {});
-					for (t in e[n].addons) e[n].addons[t].setup.call(this);
-				},
-				_getOriginalMenuId: function () {
-					var e = this.$menu.attr('id');
-					return e && e.length && this.conf.clone && (e = i.umm(e)), e;
-				},
-				__api: function () {
-					var t = this,
-						n = {};
-					return (
-						e.each(this._api, function (e) {
-							var s = this;
-							n[s] = function () {
-								var e = t[s].apply(t, arguments);
-								return 'undefined' == typeof e ? n : e;
-							};
-						}),
-						n
-					);
-				},
-				__valueOrFn: function (e, t, n) {
-					return 'function' == typeof e
-						? e.call(t[0])
-						: 'undefined' == typeof e && 'undefined' != typeof n
-						? n
-						: e;
-				},
-				__refactorClass: function (e, t, n) {
-					return e
-						.filter('.' + t)
-						.removeClass(t)
-						.addClass(i[n]);
-				},
-				__findAddBack: function (e, t) {
-					return e.find(t).add(e.filter(t));
-				},
-				__filterListItems: function (e) {
-					return e.not('.' + i.divider).not('.' + i.hidden);
-				},
-				__transitionend: function (e, t, n) {
-					var s = !1,
-						i = function () {
-							s || t.call(e[0]), (s = !0);
-						};
-					e.one(o.transitionend, i),
-						e.one(o.webkitTransitionEnd, i),
-						setTimeout(i, 1.1 * n);
-				},
-				__getUniqueId: function () {
-					return i.mm(e[n].uniqueId++);
-				},
-			}),
-			(e.fn[n] = function (s, i) {
-				return (
-					t(),
-					(s = e.extend(!0, {}, e[n].defaults, s)),
-					(i = e.extend(!0, {}, e[n].configuration, i)),
-					this.each(function () {
-						var t = e(this);
-						if (!t.data(n)) {
-							var a = new e[n](t, s, i);
-							a.$menu.data(n, a.__api());
-						}
-					})
-				);
-			}),
-			(e[n].support = {
-				touch: 'ontouchstart' in window || navigator.msMaxTouchPoints || !1,
-				csstransitions: (function () {
-					if (
-						'undefined' != typeof Modernizr &&
-						'undefined' != typeof Modernizr.csstransitions
-					)
-						return Modernizr.csstransitions;
-					var e = document.body || document.documentElement,
-						t = e.style,
-						n = 'transition';
-					if ('string' == typeof t[n]) return !0;
-					var s = ['Moz', 'webkit', 'Webkit', 'Khtml', 'O', 'ms'];
-					n = n.charAt(0).toUpperCase() + n.substr(1);
-					for (var i = 0; i < s.length; i++)
-						if ('string' == typeof t[s[i] + n]) return !0;
-					return !1;
-				})(),
-			});
-		var i, a, o, r;
-	}
-})(jQuery)
-/*
- * jQuery mmenu offCanvas addon
- * mmenu.frebsite.nl
- *
- * Copyright (c) Fred Heusschen
- */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'offCanvas';
-		(e[t].addons[n] = {
-			setup: function () {
-				if (this.opts[n]) {
-					var i = this.opts[n],
-						a = this.conf[n];
-					(o = e[t].glbl),
-						(this._api = e.merge(this._api, ['open', 'close', 'setPage'])),
-						('top' == i.position || 'bottom' == i.position) &&
-							(i.zposition = 'front'),
-						'string' != typeof a.pageSelector &&
-							(a.pageSelector = '> ' + a.pageNodetype),
-						(o.$allMenus = (o.$allMenus || e()).add(this.$menu)),
-						(this.vars.opened = !1);
-					var r = [s.offcanvas];
-					'left' != i.position && r.push(s.mm(i.position)),
-						'back' != i.zposition && r.push(s.mm(i.zposition)),
-						this.$menu.addClass(r.join(' ')).parent().removeClass(s.wrapper),
-						this.setPage(o.$page),
-						this._initBlocker(),
-						this['_initWindow_' + n](),
-						this.$menu[a.menuInjectMethod + 'To'](a.menuWrapperSelector);
-					var l = window.location.hash;
-					if (l) {
-						var d = this._getOriginalMenuId();
-						d && d == l.slice(1) && this.open();
-					}
-				}
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('offcanvas slideout blocking modal background opening blocker page'),
-					i.add('style'),
-					a.add('resize');
-			},
-			clickAnchor: function (e, t) {
-				if (!this.opts[n]) return !1;
-				var s = this._getOriginalMenuId();
-				if (s && e.is('[href="#' + s + '"]')) return this.open(), !0;
-				if (o.$page)
-					return (
-						(s = o.$page.first().attr('id')),
-						s && e.is('[href="#' + s + '"]') ? (this.close(), !0) : !1
-					);
-			},
-		}),
-			(e[t].defaults[n] = {
-				position: 'left',
-				zposition: 'back',
-				blockUI: !0,
-				moveBackground: !0,
-			}),
-			(e[t].configuration[n] = {
-				pageNodetype: 'div',
-				pageSelector: null,
-				noPageSelector: [],
-				wrapPageIfNeeded: !0,
-				menuWrapperSelector: 'body',
-				menuInjectMethod: 'prepend',
-			}),
-			(e[t].prototype.open = function () {
-				if (!this.vars.opened) {
-					var e = this;
-					this._openSetup(),
-						setTimeout(function () {
-							e._openFinish();
-						}, this.conf.openingInterval),
-						this.trigger('open');
-				}
-			}),
-			(e[t].prototype._openSetup = function () {
-				var t = this,
-					r = this.opts[n];
-				this.closeAllOthers(),
-					o.$page.each(function () {
-						e(this).data(i.style, e(this).attr('style') || '');
-					}),
-					o.$wndw.trigger(a.resize + '-' + n, [!0]);
-				var l = [s.opened];
-				r.blockUI && l.push(s.blocking),
-					'modal' == r.blockUI && l.push(s.modal),
-					r.moveBackground && l.push(s.background),
-					'left' != r.position && l.push(s.mm(this.opts[n].position)),
-					'back' != r.zposition && l.push(s.mm(this.opts[n].zposition)),
-					this.opts.extensions && l.push(this.opts.extensions),
-					o.$html.addClass(l.join(' ')),
-					setTimeout(function () {
-						t.vars.opened = !0;
-					}, this.conf.openingInterval),
-					this.$menu.addClass(s.current + ' ' + s.opened);
-			}),
-			(e[t].prototype._openFinish = function () {
-				var e = this;
-				this.__transitionend(
-					o.$page.first(),
-					function () {
-						e.trigger('opened');
-					},
-					this.conf.transitionDuration
-				),
-					o.$html.addClass(s.opening),
-					this.trigger('opening');
-			}),
-			(e[t].prototype.close = function () {
-				if (this.vars.opened) {
-					var t = this;
-					this.__transitionend(
-						o.$page.first(),
-						function () {
-							t.$menu.removeClass(s.current).removeClass(s.opened),
-								o.$html
-									.removeClass(s.opened)
-									.removeClass(s.blocking)
-									.removeClass(s.modal)
-									.removeClass(s.background)
-									.removeClass(s.mm(t.opts[n].position))
-									.removeClass(s.mm(t.opts[n].zposition)),
-								t.opts.extensions && o.$html.removeClass(t.opts.extensions),
-								o.$page.each(function () {
-									e(this).attr('style', e(this).data(i.style));
-								}),
-								(t.vars.opened = !1),
-								t.trigger('closed');
-						},
-						this.conf.transitionDuration
-					),
-						o.$html.removeClass(s.opening),
-						this.trigger('close'),
-						this.trigger('closing');
-				}
-			}),
-			(e[t].prototype.closeAllOthers = function () {
-				o.$allMenus.not(this.$menu).each(function () {
-					var n = e(this).data(t);
-					n && n.close && n.close();
-				});
-			}),
-			(e[t].prototype.setPage = function (t) {
-				var i = this,
-					a = this.conf[n];
-				(t && t.length) ||
-					((t = o.$body.find(a.pageSelector)),
-					a.noPageSelector.length && (t = t.not(a.noPageSelector.join(', '))),
-					t.length > 1 &&
-						a.wrapPageIfNeeded &&
-						(t = t.wrapAll('<' + this.conf[n].pageNodetype + ' />').parent())),
-					t.each(function () {
-						e(this).attr('id', e(this).attr('id') || i.__getUniqueId());
-					}),
-					t.addClass(s.page + ' ' + s.slideout),
-					(o.$page = t),
-					this.trigger('setPage', t);
-			}),
-			(e[t].prototype['_initWindow_' + n] = function () {
-				o.$wndw.off(a.keydown + '-' + n).on(a.keydown + '-' + n, function (e) {
-					return o.$html.hasClass(s.opened) && 9 == e.keyCode
-						? (e.preventDefault(), !1)
-						: void 0;
-				});
-				var e = 0;
-				o.$wndw.off(a.resize + '-' + n).on(a.resize + '-' + n, function (t, n) {
-					if (1 == o.$page.length && (n || o.$html.hasClass(s.opened))) {
-						var i = o.$wndw.height();
-						(n || i != e) && ((e = i), o.$page.css('minHeight', i));
-					}
-				});
-			}),
-			(e[t].prototype._initBlocker = function () {
-				var t = this;
-				this.opts[n].blockUI &&
-					(o.$blck ||
-						(o.$blck = e(
-							'<div id="' + s.blocker + '" class="' + s.slideout + '" />'
-						)),
-					o.$blck
-						.appendTo(o.$body)
-						.off(a.touchstart + '-' + n + ' ' + a.touchmove + '-' + n)
-						.on(a.touchstart + '-' + n + ' ' + a.touchmove + '-' + n, function (e) {
-							e.preventDefault(),
-								e.stopPropagation(),
-								o.$blck.trigger(a.mousedown + '-' + n);
-						})
-						.off(a.mousedown + '-' + n)
-						.on(a.mousedown + '-' + n, function (e) {
-							e.preventDefault(),
-								o.$html.hasClass(s.modal) || (t.closeAllOthers(), t.close());
-						}));
-			});
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu scrollBugFix addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'scrollBugFix';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this,
-					r = this.opts[n];
-				this.conf[n];
-				if (
-					((o = e[t].glbl),
-					e[t].support.touch &&
-						this.opts.offCanvas &&
-						this.opts.offCanvas.blockUI &&
-						('boolean' == typeof r && (r = { fix: r }),
-						'object' != typeof r && (r = {}),
-						(r = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], r)),
-						r.fix))
-				) {
-					var l = this.$menu.attr('id'),
-						d = !1;
-					this.bind('opening', function () {
-						this.$pnls.children('.' + s.current).scrollTop(0);
-					}),
-						o.$docu.on(a.touchmove, function (e) {
-							i.vars.opened && e.preventDefault();
-						}),
-						o.$body
-							.on(
-								a.touchstart,
-								'#' + l + '> .' + s.panels + '> .' + s.current,
-								function (e) {
-									i.vars.opened &&
-										(d ||
-											((d = !0),
-											0 === e.currentTarget.scrollTop
-												? (e.currentTarget.scrollTop = 1)
-												: e.currentTarget.scrollHeight ===
-														e.currentTarget.scrollTop + e.currentTarget.offsetHeight &&
-												  (e.currentTarget.scrollTop -= 1),
-											(d = !1)));
-								}
-							)
-							.on(
-								a.touchmove,
-								'#' + l + '> .' + s.panels + '> .' + s.current,
-								function (t) {
-									i.vars.opened &&
-										e(this)[0].scrollHeight > e(this).innerHeight() &&
-										t.stopPropagation();
-								}
-							),
-						o.$wndw.on(a.orientationchange, function () {
-							i.$pnls
-								.children('.' + s.current)
-								.scrollTop(0)
-								.css({ '-webkit-overflow-scrolling': 'auto' })
-								.css({ '-webkit-overflow-scrolling': 'touch' });
-						});
-				}
-			},
-			add: function () {
-				(s = e[t]._c), (i = e[t]._d), (a = e[t]._e);
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { fix: !0 });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu autoHeight addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'autoHeight';
-		(e[t].addons[n] = {
-			setup: function () {
-				if (this.opts.offCanvas) {
-					var i = this.opts[n];
-					this.conf[n];
-					if (
-						((o = e[t].glbl),
-						'boolean' == typeof i && i && (i = { height: 'auto' }),
-						'string' == typeof i && (i = { height: i }),
-						'object' != typeof i && (i = {}),
-						(i = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], i)),
-						'auto' == i.height || 'highest' == i.height)
-					) {
-						this.$menu.addClass(s.autoheight);
-						var a = function (t) {
-							if (this.vars.opened) {
-								var n = parseInt(this.$pnls.css('top'), 10) || 0,
-									a = parseInt(this.$pnls.css('bottom'), 10) || 0,
-									o = 0;
-								this.$menu.addClass(s.measureheight),
-									'auto' == i.height
-										? ((t = t || this.$pnls.children('.' + s.current)),
-										  t.is('.' + s.vertical) &&
-												(t = t
-													.parents('.' + s.panel)
-													.not('.' + s.vertical)
-													.first()),
-										  (o = t.outerHeight()))
-										: 'highest' == i.height &&
-										  this.$pnls.children().each(function () {
-												var t = e(this);
-												t.is('.' + s.vertical) &&
-													(t = t
-														.parents('.' + s.panel)
-														.not('.' + s.vertical)
-														.first()),
-													(o = Math.max(o, t.outerHeight()));
-										  }),
-									this.$menu.height(o + n + a).removeClass(s.measureheight);
-							}
-						};
-						this.bind('opening', a),
-							'highest' == i.height && this.bind('init', a),
-							'auto' == i.height &&
-								(this.bind('update', a),
-								this.bind('openPanel', a),
-								this.bind('closePanel', a));
-					}
-				}
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('autoheight measureheight'),
-					a.add('resize');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { height: 'default' });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu backButton addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'backButton';
-		(e[t].addons[n] = {
-			setup: function () {
-				if (this.opts.offCanvas) {
-					var i = this,
-						a = this.opts[n];
-					this.conf[n];
-					if (
-						((o = e[t].glbl),
-						'boolean' == typeof a && (a = { close: a }),
-						'object' != typeof a && (a = {}),
-						(a = e.extend(!0, {}, e[t].defaults[n], a)),
-						a.close)
-					) {
-						var r = '#' + i.$menu.attr('id');
-						this.bind('opened', function (e) {
-							location.hash != r && history.pushState(null, document.title, r);
-						}),
-							e(window).on('popstate', function (e) {
-								o.$html.hasClass(s.opened)
-									? (e.stopPropagation(), i.close())
-									: location.hash == r && (e.stopPropagation(), i.open());
-							});
-					}
-				}
-			},
-			add: function () {
-				return window.history && window.history.pushState
-					? ((s = e[t]._c), (i = e[t]._d), void (a = e[t]._e))
-					: void (e[t].addons[n].setup = function () {});
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { close: !1 });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu columns addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'columns';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this.opts[n];
-				this.conf[n];
-				if (
-					((o = e[t].glbl),
-					'boolean' == typeof i && (i = { add: i }),
-					'number' == typeof i && (i = { add: !0, visible: i }),
-					'object' != typeof i && (i = {}),
-					'number' == typeof i.visible &&
-						(i.visible = { min: i.visible, max: i.visible }),
-					(i = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], i)),
-					i.add)
-				) {
-					(i.visible.min = Math.max(1, Math.min(6, i.visible.min))),
-						(i.visible.max = Math.max(i.visible.min, Math.min(6, i.visible.max))),
-						this.$menu.addClass(s.columns);
-					for (
-						var a = this.opts.offCanvas ? this.$menu.add(o.$html) : this.$menu,
-							r = [],
-							l = 0;
-						l <= i.visible.max;
-						l++
-					)
-						r.push(s.columns + '-' + l);
-					r = r.join(' ');
-					var d = function (e) {
-							u.call(this, this.$pnls.children('.' + s.current)),
-								i.hideNavbars && e.removeClass(s.hasnavbar);
-						},
-						c = function () {
-							var e = this.$pnls.children('.' + s.panel).filter('.' + s.opened).length;
-							(e = Math.min(i.visible.max, Math.max(i.visible.min, e))),
-								a.removeClass(r).addClass(s.columns + '-' + e);
-						},
-						h = function () {
-							this.opts.offCanvas && o.$html.removeClass(r);
-						},
-						u = function (t) {
-							this.$pnls
-								.children('.' + s.panel)
-								.removeClass(r)
-								.filter('.' + s.subopened)
-								.removeClass(s.hidden)
-								.add(t)
-								.slice(-i.visible.max)
-								.each(function (t) {
-									e(this).addClass(s.columns + '-' + t);
-								});
-						};
-					this.bind('open', c),
-						this.bind('close', h),
-						this.bind('init', d),
-						this.bind('openPanel', u),
-						this.bind('openingPanel', c),
-						this.bind('openedPanel', c),
-						this.opts.offCanvas || c.call(this);
-				}
-			},
-			add: function () {
-				(s = e[t]._c), (i = e[t]._d), (a = e[t]._e), s.add('columns');
-			},
-			clickAnchor: function (t, i) {
-				if (!this.opts[n].add) return !1;
-				if (i) {
-					var a = t.attr('href');
-					if (a.length > 1 && '#' == a.slice(0, 1))
-						try {
-							var o = e(a, this.$menu);
-							if (o.is('.' + s.panel))
-								for (
-									var r =
-										parseInt(
-											t
-												.closest('.' + s.panel)
-												.attr('class')
-												.split(s.columns + '-')[1]
-												.split(' ')[0],
-											10
-										) + 1;
-									r !== !1;
-
-								) {
-									var l = this.$pnls.children('.' + s.columns + '-' + r);
-									if (!l.length) {
-										r = !1;
-										break;
-									}
-									r++,
-										l
-											.removeClass(s.subopened)
-											.removeClass(s.opened)
-											.removeClass(s.current)
-											.removeClass(s.highest)
-											.addClass(s.hidden);
-								}
-						} catch (d) {}
-				}
-			},
-		}),
-			(e[t].defaults[n] = {
-				add: !1,
-				visible: { min: 1, max: 3 },
-				hideNavbars: !1,
-			});
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu counters addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'counters';
-		(e[t].addons[n] = {
-			setup: function () {
-				var a = this,
-					r = this.opts[n];
-				this.conf[n];
-				(o = e[t].glbl),
-					'boolean' == typeof r && (r = { add: r, update: r }),
-					'object' != typeof r && (r = {}),
-					(r = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], r)),
-					this.bind('init', function (t) {
-						this.__refactorClass(
-							e('em', t),
-							this.conf.classNames[n].counter,
-							'counter'
-						);
-					}),
-					r.add &&
-						this.bind('init', function (t) {
-							var n;
-							switch (r.addTo) {
-								case 'panels':
-									n = t;
-									break;
-								default:
-									n = t.filter(r.addTo);
-							}
-							n.each(function () {
-								var t = e(this).data(i.parent);
-								t &&
-									(t.children('em.' + s.counter).length ||
-										t.prepend(e('<em class="' + s.counter + '" />')));
-							});
-						}),
-					r.update &&
-						this.bind('update', function () {
-							this.$pnls.children('.' + s.panel).each(function () {
-								var t = e(this),
-									n = t.data(i.parent);
-								if (n) {
-									var o = n.children('em.' + s.counter);
-									o.length &&
-										((t = t.children('.' + s.listview)),
-										t.length && o.html(a.__filterListItems(t.children()).length));
-								}
-							});
-						});
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('counter search noresultsmsg');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { add: !1, addTo: 'panels', update: !1 }),
-			(e[t].configuration.classNames[n] = { counter: 'Counter' });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu dividers addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'dividers';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this,
-					r = this.opts[n];
-				this.conf[n];
-				if (
-					((o = e[t].glbl),
-					'boolean' == typeof r && (r = { add: r, fixed: r }),
-					'object' != typeof r && (r = {}),
-					(r = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], r)),
-					this.bind('init', function (t) {
-						this.__refactorClass(
-							e('li', this.$menu),
-							this.conf.classNames[n].collapsed,
-							'collapsed'
-						);
-					}),
-					r.add &&
-						this.bind('init', function (t) {
-							var n;
-							switch (r.addTo) {
-								case 'panels':
-									n = t;
-									break;
-								default:
-									n = t.filter(r.addTo);
-							}
-							e('.' + s.divider, n).remove(),
-								n
-									.find('.' + s.listview)
-									.not('.' + s.vertical)
-									.each(function () {
-										var t = '';
-										i.__filterListItems(e(this).children()).each(function () {
-											var n = e
-												.trim(e(this).children('a, span').text())
-												.slice(0, 1)
-												.toLowerCase();
-											n != t &&
-												n.length &&
-												((t = n),
-												e('<li class="' + s.divider + '">' + n + '</li>').insertBefore(
-													this
-												));
-										});
-									});
-						}),
-					r.collapse &&
-						this.bind('init', function (t) {
-							e('.' + s.divider, t).each(function () {
-								var t = e(this),
-									n = t.nextUntil('.' + s.divider, '.' + s.collapsed);
-								n.length &&
-									(t.children('.' + s.subopen).length ||
-										(t.wrapInner('<span />'),
-										t.prepend(
-											'<a href="#" class="' + s.subopen + ' ' + s.fullsubopen + '" />'
-										)));
-							});
-						}),
-					r.fixed)
-				) {
-					var l = function (t) {
-						t = t || this.$pnls.children('.' + s.current);
-						var n = t.find('.' + s.divider).not('.' + s.hidden);
-						if (n.length) {
-							this.$menu.addClass(s.hasdividers);
-							var i = t.scrollTop() || 0,
-								a = '';
-							t.is(':visible') &&
-								t
-									.find('.' + s.divider)
-									.not('.' + s.hidden)
-									.each(function () {
-										e(this).position().top + i < i + 1 && (a = e(this).text());
-									}),
-								this.$fixeddivider.text(a);
-						} else this.$menu.removeClass(s.hasdividers);
-					};
-					(this.$fixeddivider = e(
-						'<ul class="' +
-							s.listview +
-							' ' +
-							s.fixeddivider +
-							'"><li class="' +
-							s.divider +
-							'"></li></ul>'
-					)
-						.prependTo(this.$pnls)
-						.children()),
-						this.bind('openPanel', l),
-						this.bind('update', l),
-						this.bind('init', function (t) {
-							t.off(a.scroll + '-dividers ' + a.touchmove + '-dividers').on(
-								a.scroll + '-dividers ' + a.touchmove + '-dividers',
-								function (t) {
-									l.call(i, e(this));
-								}
-							);
-						});
-				}
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('collapsed uncollapsed fixeddivider hasdividers'),
-					a.add('scroll');
-			},
-			clickAnchor: function (e, t) {
-				if (this.opts[n].collapse && t) {
-					var i = e.parent();
-					if (i.is('.' + s.divider)) {
-						var a = i.nextUntil('.' + s.divider, '.' + s.collapsed);
-						return (
-							i.toggleClass(s.opened),
-							a[i.hasClass(s.opened) ? 'addClass' : 'removeClass'](s.uncollapsed),
-							!0
-						);
-					}
-				}
-				return !1;
-			},
-		}),
-			(e[t].defaults[n] = { add: !1, addTo: 'panels', fixed: !1, collapse: !1 }),
-			(e[t].configuration.classNames[n] = { collapsed: 'Collapsed' });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu dragOpen addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		function t(e, t, n) {
-			return t > e && (e = t), e > n && (e = n), e;
-		}
-		var n = 'mmenu',
-			s = 'dragOpen';
-		(e[n].addons[s] = {
-			setup: function () {
-				if (this.opts.offCanvas) {
-					var a = this,
-						o = this.opts[s],
-						l = this.conf[s];
-					if (
-						((r = e[n].glbl),
-						'boolean' == typeof o && (o = { open: o }),
-						'object' != typeof o && (o = {}),
-						(o = this.opts[s] = e.extend(!0, {}, e[n].defaults[s], o)),
-						o.open)
-					) {
-						var d,
-							c,
-							h,
-							u,
-							p,
-							f = {},
-							v = 0,
-							m = !1,
-							g = !1,
-							b = 0,
-							C = 0;
-						switch (this.opts.offCanvas.position) {
-							case 'left':
-							case 'right':
-								(f.events = 'panleft panright'),
-									(f.typeLower = 'x'),
-									(f.typeUpper = 'X'),
-									(g = 'width');
-								break;
-							case 'top':
-							case 'bottom':
-								(f.events = 'panup pandown'),
-									(f.typeLower = 'y'),
-									(f.typeUpper = 'Y'),
-									(g = 'height');
-						}
-						switch (this.opts.offCanvas.position) {
-							case 'right':
-							case 'bottom':
-								(f.negative = !0),
-									(u = function (e) {
-										e >= r.$wndw[g]() - o.maxStartPos && (v = 1);
-									});
-								break;
-							default:
-								(f.negative = !1),
-									(u = function (e) {
-										e <= o.maxStartPos && (v = 1);
-									});
-						}
-						switch (this.opts.offCanvas.position) {
-							case 'left':
-								(f.open_dir = 'right'), (f.close_dir = 'left');
-								break;
-							case 'right':
-								(f.open_dir = 'left'), (f.close_dir = 'right');
-								break;
-							case 'top':
-								(f.open_dir = 'down'), (f.close_dir = 'up');
-								break;
-							case 'bottom':
-								(f.open_dir = 'up'), (f.close_dir = 'down');
-						}
-						switch (this.opts.offCanvas.zposition) {
-							case 'front':
-								p = function () {
-									return this.$menu;
-								};
-								break;
-							default:
-								p = function () {
-									return e('.' + i.slideout);
-								};
-						}
-						var _ = this.__valueOrFn(o.pageNode, this.$menu, r.$page);
-						'string' == typeof _ && (_ = e(_));
-						var $ = new Hammer(_[0], o.vendors.hammer);
-						$.on('panstart', function (e) {
-							u(e.center[f.typeLower]), (r.$slideOutNodes = p()), (m = f.open_dir);
-						})
-							.on(f.events + ' panend', function (e) {
-								v > 0 && e.preventDefault();
-							})
-							.on(f.events, function (e) {
-								if (
-									((d = e['delta' + f.typeUpper]),
-									f.negative && (d = -d),
-									d != b && (m = d >= b ? f.open_dir : f.close_dir),
-									(b = d),
-									b > o.threshold && 1 == v)
-								) {
-									if (r.$html.hasClass(i.opened)) return;
-									(v = 2),
-										a._openSetup(),
-										a.trigger('opening'),
-										r.$html.addClass(i.dragging),
-										(C = t(r.$wndw[g]() * l[g].perc, l[g].min, l[g].max));
-								}
-								2 == v &&
-									((c = t(b, 10, C) - ('front' == a.opts.offCanvas.zposition ? C : 0)),
-									f.negative && (c = -c),
-									(h = 'translate' + f.typeUpper + '(' + c + 'px )'),
-									r.$slideOutNodes.css({
-										'-webkit-transform': '-webkit-' + h,
-										transform: h,
-									}));
-							})
-							.on('panend', function (e) {
-								2 == v &&
-									(r.$html.removeClass(i.dragging),
-									r.$slideOutNodes.css('transform', ''),
-									a[m == f.open_dir ? '_openFinish' : 'close']()),
-									(v = 0);
-							});
-					}
-				}
-			},
-			add: function () {
-				return 'function' != typeof Hammer || Hammer.VERSION < 2
-					? void (e[n].addons[s].setup = function () {})
-					: ((i = e[n]._c), (a = e[n]._d), (o = e[n]._e), void i.add('dragging'));
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[n].defaults[s] = {
-				open: !1,
-				maxStartPos: 100,
-				threshold: 50,
-				vendors: { hammer: {} },
-			}),
-			(e[n].configuration[s] = {
-				width: { perc: 0.8, min: 140, max: 440 },
-				height: { perc: 0.8, min: 140, max: 880 },
-			});
-		var i, a, o, r;
-	})(jQuery)
-	/*
-	 * jQuery mmenu dropdown addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'dropdown';
-		(e[t].addons[n] = {
-			setup: function () {
-				if (this.opts.offCanvas) {
-					var r = this,
-						l = this.opts[n],
-						d = this.conf[n];
-					if (
-						((o = e[t].glbl),
-						'boolean' == typeof l && l && (l = { drop: l }),
-						'object' != typeof l && (l = {}),
-						'string' == typeof l.position && (l.position = { of: l.position }),
-						(l = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], l)),
-						l.drop)
-					) {
-						if ('string' != typeof l.position.of) {
-							var c = this.$menu.attr('id');
-							c &&
-								c.length &&
-								(this.conf.clone && (c = s.umm(c)),
-								(l.position.of = '[href="#' + c + '"]'));
-						}
-						if ('string' == typeof l.position.of) {
-							var h = e(l.position.of);
-							if (h.length) {
-								this.$menu.addClass(s.dropdown),
-									l.tip && this.$menu.addClass(s.tip),
-									(l.event = l.event.split(' ')),
-									1 == l.event.length && (l.event[1] = l.event[0]),
-									'hover' == l.event[0] &&
-										h.on(a.mouseenter + '-dropdown', function () {
-											r.open();
-										}),
-									'hover' == l.event[1] &&
-										this.$menu.on(a.mouseleave + '-dropdown', function () {
-											r.close();
-										}),
-									this.bind('opening', function () {
-										this.$menu.data(i.style, this.$menu.attr('style') || ''),
-											o.$html.addClass(s.dropdown);
-									}),
-									this.bind('closed', function () {
-										this.$menu.attr('style', this.$menu.data(i.style)),
-											o.$html.removeClass(s.dropdown);
-									});
-								var u = function (i, a) {
-										var r = a[0],
-											c = a[1],
-											u = 'x' == i ? 'scrollLeft' : 'scrollTop',
-											p = 'x' == i ? 'outerWidth' : 'outerHeight',
-											f = 'x' == i ? 'left' : 'top',
-											v = 'x' == i ? 'right' : 'bottom',
-											m = 'x' == i ? 'width' : 'height',
-											g = 'x' == i ? 'maxWidth' : 'maxHeight',
-											b = null,
-											C = o.$wndw[u](),
-											_ = (h.offset()[f] -= C),
-											$ = _ + h[p](),
-											y = o.$wndw[m](),
-											x = d.offset.button[i] + d.offset.viewport[i];
-										if (l.position[i])
-											switch (l.position[i]) {
-												case 'left':
-												case 'bottom':
-													b = 'after';
-													break;
-												case 'right':
-												case 'top':
-													b = 'before';
-											}
-										null === b && (b = y / 2 > _ + ($ - _) / 2 ? 'after' : 'before');
-										var w, k;
-										return (
-											'after' == b
-												? ((w = 'x' == i ? _ : $),
-												  (k = y - (w + x)),
-												  (r[f] = w + d.offset.button[i]),
-												  (r[v] = 'auto'),
-												  c.push(s['x' == i ? 'tipleft' : 'tiptop']))
-												: ((w = 'x' == i ? $ : _),
-												  (k = w - x),
-												  (r[v] = 'calc( 100% - ' + (w - d.offset.button[i]) + 'px )'),
-												  (r[f] = 'auto'),
-												  c.push(s['x' == i ? 'tipright' : 'tipbottom'])),
-											(r[g] = Math.min(e[t].configuration[n][m].max, k)),
-											[r, c]
-										);
-									},
-									p = function (e) {
-										if (this.vars.opened) {
-											this.$menu.attr('style', this.$menu.data(i.style));
-											var t = [{}, []];
-											(t = u.call(this, 'y', t)),
-												(t = u.call(this, 'x', t)),
-												this.$menu.css(t[0]),
-												l.tip &&
-													this.$menu
-														.removeClass(
-															s.tipleft + ' ' + s.tipright + ' ' + s.tiptop + ' ' + s.tipbottom
-														)
-														.addClass(t[1].join(' '));
-										}
-									};
-								this.bind('opening', p),
-									o.$wndw.on(a.resize + '-dropdown', function (e) {
-										p.call(r);
-									}),
-									this.opts.offCanvas.blockUI ||
-										o.$wndw.on(a.scroll + '-dropdown', function (e) {
-											p.call(r);
-										});
-							}
-						}
-					}
-				}
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('dropdown tip tipleft tipright tiptop tipbottom'),
-					a.add('mouseenter mouseleave resize scroll');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { drop: !1, event: 'click', position: {}, tip: !0 }),
-			(e[t].configuration[n] = {
-				offset: { button: { x: -10, y: 10 }, viewport: { x: 20, y: 20 } },
-				height: { max: 880 },
-				width: { max: 440 },
-			});
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu fixedElements addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'fixedElements';
-		(e[t].addons[n] = {
-			setup: function () {
-				if (this.opts.offCanvas) {
-					var s = this.opts[n];
-					this.conf[n];
-					(o = e[t].glbl),
-						(s = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], s));
-					var i = function (e) {
-						var t = this.conf.classNames[n].fixed;
-						this.__refactorClass(e.find('.' + t), t, 'slideout').appendTo(o.$body);
-					};
-					i.call(this, o.$page), this.bind('setPage', i);
-				}
-			},
-			add: function () {
-				(s = e[t]._c), (i = e[t]._d), (a = e[t]._e), s.add('fixed');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].configuration.classNames[n] = { fixed: 'Fixed' });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu iconPanels addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'iconPanels';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this,
-					a = this.opts[n];
-				this.conf[n];
-				if (
-					((o = e[t].glbl),
-					'boolean' == typeof a && (a = { add: a }),
-					'number' == typeof a && (a = { add: !0, visible: a }),
-					'object' != typeof a && (a = {}),
-					(a = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], a)),
-					a.visible++,
-					a.add)
-				) {
-					this.$menu.addClass(s.iconpanel);
-					for (var r = [], l = 0; l <= a.visible; l++) r.push(s.iconpanel + '-' + l);
-					r = r.join(' ');
-					var d = function (t) {
-						t.hasClass(s.vertical) ||
-							i.$pnls
-								.children('.' + s.panel)
-								.removeClass(r)
-								.filter('.' + s.subopened)
-								.removeClass(s.hidden)
-								.add(t)
-								.not('.' + s.vertical)
-								.slice(-a.visible)
-								.each(function (t) {
-									e(this).addClass(s.iconpanel + '-' + t);
-								});
-					};
-					this.bind('openPanel', d),
-						this.bind('init', function (t) {
-							d.call(i, i.$pnls.children('.' + s.current)),
-								a.hideNavbars && t.removeClass(s.hasnavbar),
-								t.not('.' + s.vertical).each(function () {
-									e(this).children('.' + s.subblocker).length ||
-										e(this).prepend(
-											'<a href="#' +
-												e(this)
-													.closest('.' + s.panel)
-													.attr('id') +
-												'" class="' +
-												s.subblocker +
-												'" />'
-										);
-								});
-						});
-				}
-			},
-			add: function () {
-				(s = e[t]._c), (i = e[t]._d), (a = e[t]._e), s.add('iconpanel subblocker');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { add: !1, visible: 3, hideNavbars: !1 });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this,
-					a = this.opts[n],
-					r = this.conf[n];
-				if (((o = e[t].glbl), 'undefined' != typeof a)) {
-					a instanceof Array || (a = [a]);
-					var l = {};
-					e.each(a, function (o) {
-						var d = a[o];
-						'boolean' == typeof d && d && (d = {}),
-							'object' != typeof d && (d = {}),
-							'undefined' == typeof d.content && (d.content = ['prev', 'title']),
-							d.content instanceof Array || (d.content = [d.content]),
-							(d = e.extend(!0, {}, i.opts.navbar, d));
-						var c = d.position,
-							h = d.height;
-						'number' != typeof h && (h = 1),
-							(h = Math.min(4, Math.max(1, h))),
-							'bottom' != c && (c = 'top'),
-							l[c] || (l[c] = 0),
-							l[c]++;
-						var u = e('<div />').addClass(
-							s.navbar +
-								' ' +
-								s.navbar +
-								'-' +
-								c +
-								' ' +
-								s.navbar +
-								'-' +
-								c +
-								'-' +
-								l[c] +
-								' ' +
-								s.navbar +
-								'-size-' +
-								h
-						);
-						l[c] += h - 1;
-						for (var p = 0, f = 0, v = d.content.length; v > f; f++) {
-							var m = e[t].addons[n][d.content[f]] || !1;
-							m
-								? (p += m.call(i, u, d, r))
-								: ((m = d.content[f]),
-								  m instanceof e || (m = e(d.content[f])),
-								  u.append(m));
-						}
-						(p += Math.ceil(
-							u
-								.children()
-								.not('.' + s.btn)
-								.not('.' + s.title + '-prev').length / h
-						)),
-							p > 1 && u.addClass(s.navbar + '-content-' + p),
-							u.children('.' + s.btn).length && u.addClass(s.hasbtns),
-							u.prependTo(i.$menu);
-					});
-					for (var d in l) i.$menu.addClass(s.hasnavbar + '-' + d + '-' + l[d]);
-				}
-			},
-			add: function () {
-				(s = e[t]._c), (i = e[t]._d), (a = e[t]._e), s.add('close hasbtns');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].configuration[n] = { breadcrumbSeparator: '/' }),
-			(e[t].configuration.classNames[n] = {});
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon breadcrumbs content
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars',
-			s = 'breadcrumbs';
-		e[t].addons[n][s] = function (n, s, i) {
-			var a = e[t]._c,
-				o = e[t]._d;
-			a.add('breadcrumbs separator');
-			var r = e('<span class="' + a.breadcrumbs + '" />').appendTo(n);
-			this.bind('init', function (t) {
-				t.removeClass(a.hasnavbar).each(function () {
-					for (
-						var t = [],
-							n = e(this),
-							s = e('<span class="' + a.breadcrumbs + '"></span>'),
-							r = e(this).children().first(),
-							l = !0;
-						r && r.length;
-
-					) {
-						r.is('.' + a.panel) || (r = r.closest('.' + a.panel));
-						var d = r
-							.children('.' + a.navbar)
-							.children('.' + a.title)
-							.text();
-						t.unshift(
-							l
-								? '<span>' + d + '</span>'
-								: '<a href="#' + r.attr('id') + '">' + d + '</a>'
-						),
-							(l = !1),
-							(r = r.data(o.parent));
-					}
-					s.append(
-						t.join(
-							'<span class="' + a.separator + '">' + i.breadcrumbSeparator + '</span>'
-						)
-					).appendTo(n.children('.' + a.navbar));
-				});
-			});
-			var l = function () {
-				r.html(
-					this.$pnls
-						.children('.' + a.current)
-						.children('.' + a.navbar)
-						.children('.' + a.breadcrumbs)
-						.html()
-				);
+				dots: false,
+				dotsClass: 'slick-dots',
+				draggable: true,
+				easing: 'linear',
+				edgeFriction: 0.35,
+				fade: false,
+				focusOnSelect: false,
+				focusOnChange: false,
+				infinite: true,
+				initialSlide: 0,
+				lazyLoad: 'ondemand',
+				mobileFirst: false,
+				pauseOnHover: true,
+				pauseOnFocus: true,
+				pauseOnDotsHover: false,
+				respondTo: 'window',
+				responsive: null,
+				rows: 1,
+				rtl: false,
+				slide: '',
+				slidesPerRow: 1,
+				slidesToShow: 1,
+				slidesToScroll: 1,
+				speed: 500,
+				swipe: true,
+				swipeToSlide: false,
+				touchMove: true,
+				touchThreshold: 5,
+				useCSS: true,
+				useTransform: true,
+				variableWidth: false,
+				vertical: false,
+				verticalSwiping: false,
+				waitForAnimate: true,
+				zIndex: 1e3,
 			};
-			return this.bind('openPanel', l), this.bind('init', l), 0;
-		};
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon close content
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars',
-			s = 'close';
-		e[t].addons[n][s] = function (n, s) {
-			var i = e[t]._c,
-				a = e[t].glbl,
-				o = e('<a class="' + i.close + ' ' + i.btn + '" href="#" />').appendTo(n),
-				r = function (e) {
-					o.attr('href', '#' + e.attr('id'));
-				};
-			return r.call(this, a.$page), this.bind('setPage', r), -1;
-		};
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon next content
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars',
-			s = 'next';
-		(e[t].addons[n][s] = function (s, i) {
-			var a,
-				o,
-				r = e[t]._c,
-				l = e('<a class="' + r.next + ' ' + r.btn + '" href="#" />').appendTo(s),
-				d = function (e) {
-					e = e || this.$pnls.children('.' + r.current);
-					var t = e.find('.' + this.conf.classNames[n].panelNext);
-					(a = t.attr('href')),
-						(o = t.html()),
-						l[a ? 'attr' : 'removeAttr']('href', a),
-						l[a || o ? 'removeClass' : 'addClass'](r.hidden),
-						l.html(o);
-				};
-			return (
-				this.bind('openPanel', d),
-				this.bind('init', function () {
-					d.call(this);
-				}),
-				-1
-			);
-		}),
-			(e[t].configuration.classNames[n].panelNext = 'Next');
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon prev content
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars',
-			s = 'prev';
-		(e[t].addons[n][s] = function (s, i) {
-			var a = e[t]._c,
-				o = e('<a class="' + a.prev + ' ' + a.btn + '" href="#" />').appendTo(s);
-			this.bind('init', function (e) {
-				e.removeClass(a.hasnavbar)
-					.children('.' + a.navbar)
-					.addClass(a.hidden);
-			});
-			var r,
-				l,
-				d = function (e) {
-					if (
-						((e = e || this.$pnls.children('.' + a.current)), !e.hasClass(a.vertical))
-					) {
-						var t = e.find('.' + this.conf.classNames[n].panelPrev);
-						t.length || (t = e.children('.' + a.navbar).children('.' + a.prev)),
-							(r = t.attr('href')),
-							(l = t.html()),
-							o[r ? 'attr' : 'removeAttr']('href', r),
-							o[r || l ? 'removeClass' : 'addClass'](a.hidden),
-							o.html(l);
-					}
-				};
-			return (
-				this.bind('openPanel', d),
-				this.bind('init', function () {
-					d.call(this);
-				}),
-				-1
-			);
-		}),
-			(e[t].configuration.classNames[n].panelPrev = 'Prev');
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon searchfield content
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars',
-			s = 'searchfield';
-		e[t].addons[n][s] = function (n, s) {
-			var i = e[t]._c,
-				a = e('<div class="' + i.search + '" />').appendTo(n);
-			return (
-				'object' != typeof this.opts.searchfield && (this.opts.searchfield = {}),
-				(this.opts.searchfield.add = !0),
-				(this.opts.searchfield.addTo = a),
-				0
-			);
-		};
-	})(jQuery)
-	/*
-	 * jQuery mmenu navbar addon title content
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'navbars',
-			s = 'title';
-		(e[t].addons[n][s] = function (s, i) {
-			var a,
-				o,
-				r = e[t]._c,
-				l = e('<a class="' + r.title + '" />').appendTo(s),
-				d = function (e) {
-					if (
-						((e = e || this.$pnls.children('.' + r.current)), !e.hasClass(r.vertical))
-					) {
-						var t = e.find('.' + this.conf.classNames[n].panelTitle);
-						t.length || (t = e.children('.' + r.navbar).children('.' + r.title)),
-							(a = t.attr('href')),
-							(o = t.html() || i.title),
-							l[a ? 'attr' : 'removeAttr']('href', a),
-							l[a || o ? 'removeClass' : 'addClass'](r.hidden),
-							l.html(o);
-					}
-				};
-			return (
-				this.bind('openPanel', d),
-				this.bind('init', function (e) {
-					d.call(this);
-				}),
-				0
-			);
-		}),
-			(e[t].configuration.classNames[n].panelTitle = 'Title');
-	})(jQuery)
-	/*
-	 * jQuery mmenu screenReader addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		function t(e, t, n) {
-			e.prop('aria-' + t, n)[n ? 'attr' : 'removeAttr']('aria-' + t, 'true');
-		}
-		function n(e) {
-			return '<span class="' + a.sronly + '">' + e + '</span>';
-		}
-		var s = 'mmenu',
-			i = 'screenReader';
-		(e[s].addons[i] = {
-			setup: function () {
-				var o = this.opts[i],
-					r = this.conf[i];
-				if (
-					((l = e[s].glbl),
-					'boolean' == typeof o && (o = { aria: o, text: o }),
-					'object' != typeof o && (o = {}),
-					(o = this.opts[i] = e.extend(!0, {}, e[s].defaults[i], o)),
-					o.aria)
-				) {
-					if (this.opts.offCanvas) {
-						var d = function () {
-								t(this.$menu, 'hidden', !1);
-							},
-							c = function () {
-								t(this.$menu, 'hidden', !0);
-							};
-						this.bind('open', d), this.bind('close', c), c.call(this);
-					}
-					var h = function () {
-							t(this.$menu.find('.' + a.hidden), 'hidden', !0),
-								t(
-									this.$menu.find('[aria-hidden="true"]').not('.' + a.hidden),
-									'hidden',
-									!1
-								);
-						},
-						u = function (e) {
-							t(
-								this.$pnls
-									.children('.' + a.panel)
-									.not(e)
-									.not('.' + a.hidden),
-								'hidden',
-								!0
-							),
-								t(e, 'hidden', !1);
-						};
-					this.bind('update', h),
-						this.bind('openPanel', h),
-						this.bind('openPanel', u);
-					var p = function (e) {
-						t(e.find('.' + a.prev + ', .' + a.next), 'haspopup', !0);
-					};
-					this.bind('init', p), p.call(this, this.$menu.children('.' + a.navbar));
-				}
-				if (o.text) {
-					var f = function (t) {
-						t
-							.children('.' + a.navbar)
-							.children('.' + a.prev)
-							.html(n(r.text.closeSubmenu))
-							.end()
-							.children('.' + a.next)
-							.html(n(r.text.openSubmenu))
-							.end()
-							.children('.' + a.close)
-							.html(n(r.text.closeMenu)),
-							t.is('.' + a.panel) &&
-								t
-									.find('.' + a.listview)
-									.find('.' + a.next)
-									.each(function () {
-										e(this).html(
-											n(
-												r.text[
-													e(this)
-														.parent()
-														.is('.' + a.vertical)
-														? 'toggleSubmenu'
-														: 'openSubmenu'
-												]
-											)
-										);
-									});
-					};
-					this.bind('init', f), f.call(this, this.$menu);
-				}
-			},
-			add: function () {
-				(a = e[s]._c), (o = e[s]._d), (r = e[s]._e), a.add('sronly');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[s].defaults[i] = { aria: !1, text: !1 }),
-			(e[s].configuration[i] = {
-				text: {
-					closeMenu: 'Close menu',
-					closeSubmenu: 'Close submenu',
-					openSubmenu: 'Open submenu',
-					toggleSubmenu: 'Toggle submenu',
-				},
-			});
-		var a, o, r, l;
-	})(jQuery)
-	/*
-	 * jQuery mmenu searchfield addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		function t(e) {
-			switch (e) {
-				case 9:
-				case 16:
-				case 17:
-				case 18:
-				case 37:
-				case 38:
-				case 39:
-				case 40:
-					return !0;
+			_.initials = {
+				animating: false,
+				dragging: false,
+				autoPlayTimer: null,
+				currentDirection: 0,
+				currentLeft: null,
+				currentSlide: 0,
+				direction: 1,
+				$dots: null,
+				listWidth: null,
+				listHeight: null,
+				loadIndex: 0,
+				$nextArrow: null,
+				$prevArrow: null,
+				scrolling: false,
+				slideCount: null,
+				slideWidth: null,
+				$slideTrack: null,
+				$slides: null,
+				sliding: false,
+				slideOffset: 0,
+				swipeLeft: null,
+				swiping: false,
+				$list: null,
+				touchObject: {},
+				transformsEnabled: false,
+				unslicked: false,
+			};
+			$.extend(_, _.initials);
+			_.activeBreakpoint = null;
+			_.animType = null;
+			_.animProp = null;
+			_.breakpoints = [];
+			_.breakpointSettings = [];
+			_.cssTransitions = false;
+			_.focussed = false;
+			_.interrupted = false;
+			_.hidden = 'hidden';
+			_.paused = true;
+			_.positionProp = null;
+			_.respondTo = null;
+			_.rowCount = 1;
+			_.shouldClick = true;
+			_.$slider = $(element);
+			_.$slidesCache = null;
+			_.transformType = null;
+			_.transitionType = null;
+			_.visibilityChange = 'visibilitychange';
+			_.windowWidth = 0;
+			_.windowTimer = null;
+			dataSettings = $(element).data('slick') || {};
+			_.options = $.extend({}, _.defaults, settings, dataSettings);
+			_.currentSlide = _.options.initialSlide;
+			_.originalSettings = _.options;
+			if (typeof document.mozHidden !== 'undefined') {
+				_.hidden = 'mozHidden';
+				_.visibilityChange = 'mozvisibilitychange';
+			} else if (typeof document.webkitHidden !== 'undefined') {
+				_.hidden = 'webkitHidden';
+				_.visibilityChange = 'webkitvisibilitychange';
 			}
-			return !1;
+			_.autoPlay = $.proxy(_.autoPlay, _);
+			_.autoPlayClear = $.proxy(_.autoPlayClear, _);
+			_.autoPlayIterator = $.proxy(_.autoPlayIterator, _);
+			_.changeSlide = $.proxy(_.changeSlide, _);
+			_.clickHandler = $.proxy(_.clickHandler, _);
+			_.selectHandler = $.proxy(_.selectHandler, _);
+			_.setPosition = $.proxy(_.setPosition, _);
+			_.swipeHandler = $.proxy(_.swipeHandler, _);
+			_.dragHandler = $.proxy(_.dragHandler, _);
+			_.keyHandler = $.proxy(_.keyHandler, _);
+			_.instanceUid = instanceUid++;
+			_.htmlExpr = /^(?:\s*(<[\w\W]+>)[^>]*)$/;
+			_.registerBreakpoints();
+			_.init(true);
 		}
-		var n = 'mmenu',
-			s = 'searchfield';
-		(e[n].addons[s] = {
-			setup: function () {
-				var l = this,
-					d = this.opts[s],
-					c = this.conf[s];
-				(r = e[n].glbl),
-					'boolean' == typeof d && (d = { add: d }),
-					'object' != typeof d && (d = {}),
-					'boolean' == typeof d.resultsPanel &&
-						(d.resultsPanel = { add: d.resultsPanel }),
-					(d = this.opts[s] = e.extend(!0, {}, e[n].defaults[s], d)),
-					(c = this.conf[s] = e.extend(!0, {}, e[n].configuration[s], c)),
-					this.bind('close', function () {
-						this.$menu
-							.find('.' + i.search)
-							.find('input')
-							.blur();
-					}),
-					this.bind('init', function (n) {
-						if (d.add) {
-							var r;
-							switch (d.addTo) {
-								case 'panels':
-									r = n;
-									break;
-								default:
-									r = this.$menu.find(d.addTo);
-							}
-							if (
-								(r.each(function () {
-									var t = e(this);
-									if (!t.is('.' + i.panel) || !t.is('.' + i.vertical)) {
-										if (!t.children('.' + i.search).length) {
-											var n = l.__valueOrFn(c.clear, t),
-												s = l.__valueOrFn(c.form, t),
-												a = l.__valueOrFn(c.input, t),
-												r = l.__valueOrFn(c.submit, t),
-												h = e('<' + (s ? 'form' : 'div') + ' class="' + i.search + '" />'),
-												u = e(
-													'<input placeholder="' +
-														d.placeholder +
-														'" type="text" autocomplete="off" />'
-												);
-											h.append(u);
-											var p;
-											if (a) for (p in a) u.attr(p, a[p]);
-											if (
-												(n &&
-													e('<a class="' + i.btn + ' ' + i.clear + '" href="#" />')
-														.appendTo(h)
-														.on(o.click + '-searchfield', function (e) {
-															e.preventDefault(), u.val('').trigger(o.keyup + '-searchfield');
-														}),
-												s)
-											) {
-												for (p in s) h.attr(p, s[p]);
-												r &&
-													!n &&
-													e('<a class="' + i.btn + ' ' + i.next + '" href="#" />')
-														.appendTo(h)
-														.on(o.click + '-searchfield', function (e) {
-															e.preventDefault(), h.submit();
-														});
-											}
-											t.hasClass(i.search)
-												? t.replaceWith(h)
-												: t.prepend(h).addClass(i.hassearch);
-										}
-										if (d.noResults) {
-											var f = t.closest('.' + i.panel).length;
-											if (
-												(f || (t = l.$pnls.children('.' + i.panel).first()),
-												!t.children('.' + i.noresultsmsg).length)
-											) {
-												var v = t.children('.' + i.listview).first();
-												e('<div class="' + i.noresultsmsg + ' ' + i.hidden + '" />')
-													.append(d.noResults)
-													[v.length ? 'insertAfter' : 'prependTo'](v.length ? v : t);
-											}
-										}
-									}
-								}),
-								d.search)
-							) {
-								if (d.resultsPanel.add) {
-									d.showSubPanels = !1;
-									var h = this.$pnls.children('.' + i.resultspanel);
-									h.length ||
-										((h = e(
-											'<div class="' +
-												i.panel +
-												' ' +
-												i.resultspanel +
-												' ' +
-												i.hidden +
-												'" />'
-										)
-											.appendTo(this.$pnls)
-											.append(
-												'<div class="' +
-													i.navbar +
-													' ' +
-													i.hidden +
-													'"><a class="' +
-													i.title +
-													'">' +
-													d.resultsPanel.title +
-													'</a></div>'
-											)
-											.append('<ul class="' + i.listview + '" />')
-											.append(
-												this.$pnls
-													.find('.' + i.noresultsmsg)
-													.first()
-													.clone()
-											)),
-										this.init(h));
-								}
-								this.$menu.find('.' + i.search).each(function () {
-									var n,
-										r,
-										c = e(this),
-										u = c.closest('.' + i.panel).length;
-									u
-										? ((n = c.closest('.' + i.panel)), (r = n))
-										: ((n = e('.' + i.panel, l.$menu)), (r = l.$menu)),
-										d.resultsPanel.add && (n = n.not(h));
-									var p = c.children('input'),
-										f = l.__findAddBack(n, '.' + i.listview).children('li'),
-										v = f.filter('.' + i.divider),
-										m = l.__filterListItems(f),
-										g = 'a',
-										b = g + ', span',
-										C = '',
-										_ = function () {
-											var t = p.val().toLowerCase();
-											if (t != C) {
-												if (
-													((C = t),
-													d.resultsPanel.add && h.children('.' + i.listview).empty(),
-													n.scrollTop(0),
-													m
-														.add(v)
-														.addClass(i.hidden)
-														.find('.' + i.fullsubopensearch)
-														.removeClass(i.fullsubopen + ' ' + i.fullsubopensearch),
-													m.each(function () {
-														var t = e(this),
-															n = g;
-														(d.showTextItems || (d.showSubPanels && t.find('.' + i.next))) &&
-															(n = b);
-														var s = t.data(a.searchtext) || t.children(n).text();
-														s.toLowerCase().indexOf(C) > -1 &&
-															t.add(t.prevAll('.' + i.divider).first()).removeClass(i.hidden);
-													}),
-													d.showSubPanels &&
-														n.each(function (t) {
-															var n = e(this);
-															l.__filterListItems(n.find('.' + i.listview).children()).each(
-																function () {
-																	var t = e(this),
-																		n = t.data(a.sub);
-																	t.removeClass(i.nosubresults),
-																		n &&
-																			n
-																				.find('.' + i.listview)
-																				.children()
-																				.removeClass(i.hidden);
-																}
-															);
-														}),
-													d.resultsPanel.add)
-												)
-													if ('' === C)
-														this.closeAllPanels(),
-															this.openPanel(this.$pnls.children('.' + i.subopened).last());
-													else {
-														var s = e();
-														n.each(function () {
-															var t = l
-																.__filterListItems(
-																	e(this)
-																		.find('.' + i.listview)
-																		.children()
-																)
-																.not('.' + i.hidden)
-																.clone(!0);
-															t.length &&
-																(d.resultsPanel.dividers &&
-																	(s = s.add(
-																		'<li class="' +
-																			i.divider +
-																			'">' +
-																			e(this)
-																				.children('.' + i.navbar)
-																				.text() +
-																			'</li>'
-																	)),
-																(s = s.add(t)));
-														}),
-															s.find('.' + i.next).remove(),
-															h.children('.' + i.listview).append(s),
-															this.openPanel(h);
-													}
-												else
-													e(n.get().reverse()).each(function (t) {
-														var n = e(this),
-															s = n.data(a.parent);
-														s &&
-															(l.__filterListItems(n.find('.' + i.listview).children()).length
-																? (s.hasClass(i.hidden) &&
-																		s
-																			.children('.' + i.next)
-																			.not('.' + i.fullsubopen)
-																			.addClass(i.fullsubopen)
-																			.addClass(i.fullsubopensearch),
-																  s
-																		.removeClass(i.hidden)
-																		.removeClass(i.nosubresults)
-																		.prevAll('.' + i.divider)
-																		.first()
-																		.removeClass(i.hidden))
-																: u ||
-																  (n.hasClass(i.opened) &&
-																		setTimeout(function () {
-																			l.openPanel(s.closest('.' + i.panel));
-																		}, (t + 1) * (1.5 * l.conf.openingInterval)),
-																  s.addClass(i.nosubresults)));
-													});
-												r
-													.find('.' + i.noresultsmsg)
-													[m.not('.' + i.hidden).length ? 'addClass' : 'removeClass'](
-														i.hidden
-													),
-													this.update();
-											}
-										};
-									p.off(o.keyup + '-' + s + ' ' + o.change + '-' + s)
-										.on(o.keyup + '-' + s, function (e) {
-											t(e.keyCode) || _.call(l);
-										})
-										.on(o.change + '-' + s, function (e) {
-											_.call(l);
-										});
-									var $ = c.children('.' + i.btn);
-									$.length &&
-										p.on(o.keyup + '-' + s, function (e) {
-											$[p.val().length ? 'removeClass' : 'addClass'](i.hidden);
-										}),
-										p.trigger(o.keyup + '-' + s);
-								});
-							}
-						}
-					});
-			},
-			add: function () {
-				(i = e[n]._c),
-					(a = e[n]._d),
-					(o = e[n]._e),
-					i.add(
-						'clear search hassearch resultspanel noresultsmsg noresults nosubresults fullsubopensearch'
-					),
-					a.add('searchtext'),
-					o.add('change keyup');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[n].defaults[s] = {
-				add: !1,
-				addTo: 'panels',
-				placeholder: 'Search',
-				noResults: 'No results found.',
-				resultsPanel: { add: !1, dividers: !0, title: 'Search results' },
-				search: !0,
-				showTextItems: !1,
-				showSubPanels: !0,
-			}),
-			(e[n].configuration[s] = { clear: !1, form: !1, input: !1, submit: !1 });
-		var i, a, o, r;
-	})(jQuery)
-	/*
-	 * jQuery mmenu sectionIndexer addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'sectionIndexer';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this,
-					r = this.opts[n];
-				this.conf[n];
-				(o = e[t].glbl),
-					'boolean' == typeof r && (r = { add: r }),
-					'object' != typeof r && (r = {}),
-					(r = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], r)),
-					this.bind('init', function (t) {
-						if (r.add) {
-							var n;
-							switch (r.addTo) {
-								case 'panels':
-									n = t;
-									break;
-								default:
-									n = e(r.addTo, this.$menu).filter('.' + s.panel);
-							}
-							n.find('.' + s.divider)
-								.closest('.' + s.panel)
-								.addClass(s.hasindexer);
-						}
-						if (!this.$indexer && this.$pnls.children('.' + s.hasindexer).length) {
-							(this.$indexer = e('<div class="' + s.indexer + '" />')
-								.prependTo(this.$pnls)
-								.append(
-									'<a href="#a">a</a><a href="#b">b</a><a href="#c">c</a><a href="#d">d</a><a href="#e">e</a><a href="#f">f</a><a href="#g">g</a><a href="#h">h</a><a href="#i">i</a><a href="#j">j</a><a href="#k">k</a><a href="#l">l</a><a href="#m">m</a><a href="#n">n</a><a href="#o">o</a><a href="#p">p</a><a href="#q">q</a><a href="#r">r</a><a href="#s">s</a><a href="#t">t</a><a href="#u">u</a><a href="#v">v</a><a href="#w">w</a><a href="#x">x</a><a href="#y">y</a><a href="#z">z</a>'
-								)),
-								this.$indexer
-									.children()
-									.on(
-										a.mouseover + '-sectionindexer ' + s.touchstart + '-sectionindexer',
-										function (t) {
-											var n = e(this).attr('href').slice(1),
-												a = i.$pnls.children('.' + s.current),
-												o = a.find('.' + s.listview),
-												r = !1,
-												l = a.scrollTop();
-											a.scrollTop(0),
-												o
-													.children('.' + s.divider)
-													.not('.' + s.hidden)
-													.each(function () {
-														r === !1 &&
-															n == e(this).text().slice(0, 1).toLowerCase() &&
-															(r = e(this).position().top);
-													}),
-												a.scrollTop(r !== !1 ? r : l);
-										}
-									);
-							var o = function (e) {
-								i.$menu[(e.hasClass(s.hasindexer) ? 'add' : 'remove') + 'Class'](
-									s.hasindexer
-								);
-							};
-							this.bind('openPanel', o),
-								o.call(this, this.$pnls.children('.' + s.current));
-						}
-					});
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('indexer hasindexer'),
-					a.add('mouseover touchstart');
-			},
-			clickAnchor: function (e, t) {
-				return e.parent().is('.' + s.indexer) ? !0 : void 0;
-			},
-		}),
-			(e[t].defaults[n] = { add: !1, addTo: 'panels' });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu setSelected addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'setSelected';
-		(e[t].addons[n] = {
-			setup: function () {
-				var a = this.opts[n];
-				this.conf[n];
-				if (
-					((o = e[t].glbl),
-					'boolean' == typeof a && (a = { hover: a, parent: a }),
-					'object' != typeof a && (a = {}),
-					(a = this.opts[n] = e.extend(!0, {}, e[t].defaults[n], a)),
-					a.current ||
-						this.bind('init', function (e) {
-							e.find('.' + s.listview)
-								.children('.' + s.selected)
-								.removeClass(s.selected);
-						}),
-					a.hover && this.$menu.addClass(s.hoverselected),
-					a.parent)
-				) {
-					this.$menu.addClass(s.parentselected);
-					var r = function (e) {
-						this.$pnls
-							.find('.' + s.listview)
-							.find('.' + s.next)
-							.removeClass(s.selected);
-						for (var t = e.data(i.parent); t && t.length; )
-							t = t
-								.children('.' + s.next)
-								.addClass(s.selected)
-								.closest('.' + s.panel)
-								.data(i.parent);
-					};
-					this.bind('openedPanel', r),
-						this.bind('init', function (e) {
-							r.call(this, this.$pnls.children('.' + s.current));
-						});
+		return Slick;
+	})();
+	Slick.prototype.activateADA = function () {
+		var _ = this;
+		_.$slideTrack
+			.find('.slick-active')
+			.attr({ 'aria-hidden': 'false' })
+			.find('a, input, button, select')
+			.attr({ tabindex: '0' });
+	};
+	Slick.prototype.addSlide = Slick.prototype.slickAdd = function (
+		markup,
+		index,
+		addBefore
+	) {
+		var _ = this;
+		if (typeof index === 'boolean') {
+			addBefore = index;
+			index = null;
+		} else if (index < 0 || index >= _.slideCount) {
+			return false;
+		}
+		_.unload();
+		if (typeof index === 'number') {
+			if (index === 0 && _.$slides.length === 0) {
+				$(markup).appendTo(_.$slideTrack);
+			} else if (addBefore) {
+				$(markup).insertBefore(_.$slides.eq(index));
+			} else {
+				$(markup).insertAfter(_.$slides.eq(index));
+			}
+		} else {
+			if (addBefore === true) {
+				$(markup).prependTo(_.$slideTrack);
+			} else {
+				$(markup).appendTo(_.$slideTrack);
+			}
+		}
+		_.$slides = _.$slideTrack.children(this.options.slide);
+		_.$slideTrack.children(this.options.slide).detach();
+		_.$slideTrack.append(_.$slides);
+		_.$slides.each(function (index, element) {
+			$(element).attr('data-slick-index', index);
+		});
+		_.$slidesCache = _.$slides;
+		_.reinit();
+	};
+	Slick.prototype.animateHeight = function () {
+		var _ = this;
+		if (
+			_.options.slidesToShow === 1 &&
+			_.options.adaptiveHeight === true &&
+			_.options.vertical === false
+		) {
+			var targetHeight = _.$slides.eq(_.currentSlide).outerHeight(true);
+			_.$list.animate({ height: targetHeight }, _.options.speed);
+		}
+	};
+	Slick.prototype.animateSlide = function (targetLeft, callback) {
+		var animProps = {},
+			_ = this;
+		_.animateHeight();
+		if (_.options.rtl === true && _.options.vertical === false) {
+			targetLeft = -targetLeft;
+		}
+		if (_.transformsEnabled === false) {
+			if (_.options.vertical === false) {
+				_.$slideTrack.animate(
+					{ left: targetLeft },
+					_.options.speed,
+					_.options.easing,
+					callback
+				);
+			} else {
+				_.$slideTrack.animate(
+					{ top: targetLeft },
+					_.options.speed,
+					_.options.easing,
+					callback
+				);
+			}
+		} else {
+			if (_.cssTransitions === false) {
+				if (_.options.rtl === true) {
+					_.currentLeft = -_.currentLeft;
 				}
-			},
-			add: function () {
-				(s = e[t]._c),
-					(i = e[t]._d),
-					(a = e[t]._e),
-					s.add('hoverselected parentselected');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].defaults[n] = { current: !0, hover: !1, parent: !1 });
-		var s, i, a, o;
-	})(jQuery)
-	/*
-	 * jQuery mmenu toggles addon
-	 * mmenu.frebsite.nl
-	 *
-	 * Copyright (c) Fred Heusschen
-	 */,
-	(function (e) {
-		var t = 'mmenu',
-			n = 'toggles';
-		(e[t].addons[n] = {
-			setup: function () {
-				var i = this;
-				this.opts[n], this.conf[n];
-				(o = e[t].glbl),
-					this.bind('init', function (t) {
-						this.__refactorClass(
-							e('input', t),
-							this.conf.classNames[n].toggle,
-							'toggle'
-						),
-							this.__refactorClass(
-								e('input', t),
-								this.conf.classNames[n].check,
-								'check'
-							),
-							e('input.' + s.toggle + ', input.' + s.check, t).each(function () {
-								var t = e(this),
-									n = t.closest('li'),
-									a = t.hasClass(s.toggle) ? 'toggle' : 'check',
-									o = t.attr('id') || i.__getUniqueId();
-								n.children('label[for="' + o + '"]').length ||
-									(t.attr('id', o),
-									n.prepend(t),
-									e('<label for="' + o + '" class="' + s[a] + '"></label>').insertBefore(
-										n.children('a, span').last()
-									));
-							});
+				$({ animStart: _.currentLeft }).animate(
+					{ animStart: targetLeft },
+					{
+						duration: _.options.speed,
+						easing: _.options.easing,
+						step: function (now) {
+							now = Math.ceil(now);
+							if (_.options.vertical === false) {
+								animProps[_.animType] = 'translate(' + now + 'px, 0px)';
+								_.$slideTrack.css(animProps);
+							} else {
+								animProps[_.animType] = 'translate(0px,' + now + 'px)';
+								_.$slideTrack.css(animProps);
+							}
+						},
+						complete: function () {
+							if (callback) {
+								callback.call();
+							}
+						},
+					}
+				);
+			} else {
+				_.applyTransition();
+				targetLeft = Math.ceil(targetLeft);
+				if (_.options.vertical === false) {
+					animProps[_.animType] = 'translate3d(' + targetLeft + 'px, 0px, 0px)';
+				} else {
+					animProps[_.animType] = 'translate3d(0px,' + targetLeft + 'px, 0px)';
+				}
+				_.$slideTrack.css(animProps);
+				if (callback) {
+					setTimeout(function () {
+						_.disableTransition();
+						callback.call();
+					}, _.options.speed);
+				}
+			}
+		}
+	};
+	Slick.prototype.getNavTarget = function () {
+		var _ = this,
+			asNavFor = _.options.asNavFor;
+		if (asNavFor && asNavFor !== null) {
+			asNavFor = $(asNavFor).not(_.$slider);
+		}
+		return asNavFor;
+	};
+	Slick.prototype.asNavFor = function (index) {
+		var _ = this,
+			asNavFor = _.getNavTarget();
+		if (asNavFor !== null && typeof asNavFor === 'object') {
+			asNavFor.each(function () {
+				var target = $(this).slick('getSlick');
+				if (!target.unslicked) {
+					target.slideHandler(index, true);
+				}
+			});
+		}
+	};
+	Slick.prototype.applyTransition = function (slide) {
+		var _ = this,
+			transition = {};
+		if (_.options.fade === false) {
+			transition[_.transitionType] =
+				_.transformType + ' ' + _.options.speed + 'ms ' + _.options.cssEase;
+		} else {
+			transition[_.transitionType] =
+				'opacity ' + _.options.speed + 'ms ' + _.options.cssEase;
+		}
+		if (_.options.fade === false) {
+			_.$slideTrack.css(transition);
+		} else {
+			_.$slides.eq(slide).css(transition);
+		}
+	};
+	Slick.prototype.autoPlay = function () {
+		var _ = this;
+		_.autoPlayClear();
+		if (_.slideCount > _.options.slidesToShow) {
+			_.autoPlayTimer = setInterval(_.autoPlayIterator, _.options.autoplaySpeed);
+		}
+	};
+	Slick.prototype.autoPlayClear = function () {
+		var _ = this;
+		if (_.autoPlayTimer) {
+			clearInterval(_.autoPlayTimer);
+		}
+	};
+	Slick.prototype.autoPlayIterator = function () {
+		var _ = this,
+			slideTo = _.currentSlide + _.options.slidesToScroll;
+		if (!_.paused && !_.interrupted && !_.focussed) {
+			if (_.options.infinite === false) {
+				if (_.direction === 1 && _.currentSlide + 1 === _.slideCount - 1) {
+					_.direction = 0;
+				} else if (_.direction === 0) {
+					slideTo = _.currentSlide - _.options.slidesToScroll;
+					if (_.currentSlide - 1 === 0) {
+						_.direction = 1;
+					}
+				}
+			}
+			_.slideHandler(slideTo);
+		}
+	};
+	Slick.prototype.buildArrows = function () {
+		var _ = this;
+		if (_.options.arrows === true) {
+			_.$prevArrow = $(_.options.prevArrow).addClass('slick-arrow');
+			_.$nextArrow = $(_.options.nextArrow).addClass('slick-arrow');
+			if (_.slideCount > _.options.slidesToShow) {
+				_.$prevArrow.removeClass('slick-hidden').removeAttr('aria-hidden tabindex');
+				_.$nextArrow.removeClass('slick-hidden').removeAttr('aria-hidden tabindex');
+				if (_.htmlExpr.test(_.options.prevArrow)) {
+					_.$prevArrow.prependTo(_.options.appendArrows);
+				}
+				if (_.htmlExpr.test(_.options.nextArrow)) {
+					_.$nextArrow.appendTo(_.options.appendArrows);
+				}
+				if (_.options.infinite !== true) {
+					_.$prevArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+				}
+			} else {
+				_.$prevArrow
+					.add(_.$nextArrow)
+					.addClass('slick-hidden')
+					.attr({ 'aria-disabled': 'true', tabindex: '-1' });
+			}
+		}
+	};
+	Slick.prototype.buildDots = function () {
+		var _ = this,
+			i,
+			dot;
+		if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+			_.$slider.addClass('slick-dotted');
+			dot = $('<ul />').addClass(_.options.dotsClass);
+			for (i = 0; i <= _.getDotCount(); i += 1) {
+				dot.append($('<li />').append(_.options.customPaging.call(this, _, i)));
+			}
+			_.$dots = dot.appendTo(_.options.appendDots);
+			_.$dots.find('li').first().addClass('slick-active');
+		}
+	};
+	Slick.prototype.buildOut = function () {
+		var _ = this;
+		_.$slides = _.$slider
+			.children(_.options.slide + ':not(.slick-cloned)')
+			.addClass('slick-slide');
+		_.slideCount = _.$slides.length;
+		_.$slides.each(function (index, element) {
+			$(element)
+				.attr('data-slick-index', index)
+				.data('originalStyling', $(element).attr('style') || '');
+		});
+		_.$slider.addClass('slick-slider');
+		_.$slideTrack =
+			_.slideCount === 0
+				? $('<div class="slick-track"/>').appendTo(_.$slider)
+				: _.$slides.wrapAll('<div class="slick-track"/>').parent();
+		_.$list = _.$slideTrack.wrap('<div class="slick-list"/>').parent();
+		_.$slideTrack.css('opacity', 0);
+		if (_.options.centerMode === true || _.options.swipeToSlide === true) {
+			_.options.slidesToScroll = 1;
+		}
+		$('img[data-lazy]', _.$slider).not('[src]').addClass('slick-loading');
+		_.setupInfinite();
+		_.buildArrows();
+		_.buildDots();
+		_.updateDots();
+		_.setSlideClasses(typeof _.currentSlide === 'number' ? _.currentSlide : 0);
+		if (_.options.draggable === true) {
+			_.$list.addClass('draggable');
+		}
+	};
+	Slick.prototype.buildRows = function () {
+		var _ = this,
+			a,
+			b,
+			c,
+			newSlides,
+			numOfSlides,
+			originalSlides,
+			slidesPerSection;
+		newSlides = document.createDocumentFragment();
+		originalSlides = _.$slider.children();
+		if (_.options.rows > 0) {
+			slidesPerSection = _.options.slidesPerRow * _.options.rows;
+			numOfSlides = Math.ceil(originalSlides.length / slidesPerSection);
+			for (a = 0; a < numOfSlides; a++) {
+				var slide = document.createElement('div');
+				for (b = 0; b < _.options.rows; b++) {
+					var row = document.createElement('div');
+					for (c = 0; c < _.options.slidesPerRow; c++) {
+						var target = a * slidesPerSection + (b * _.options.slidesPerRow + c);
+						if (originalSlides.get(target)) {
+							row.appendChild(originalSlides.get(target));
+						}
+					}
+					slide.appendChild(row);
+				}
+				newSlides.appendChild(slide);
+			}
+			_.$slider.empty().append(newSlides);
+			_.$slider
+				.children()
+				.children()
+				.children()
+				.css({
+					width: 100 / _.options.slidesPerRow + '%',
+					display: 'inline-block',
+				});
+		}
+	};
+	Slick.prototype.checkResponsive = function (initial, forceUpdate) {
+		var _ = this,
+			breakpoint,
+			targetBreakpoint,
+			respondToWidth,
+			triggerBreakpoint = false;
+		var sliderWidth = _.$slider.width();
+		var windowWidth = window.innerWidth || $(window).width();
+		if (_.respondTo === 'window') {
+			respondToWidth = windowWidth;
+		} else if (_.respondTo === 'slider') {
+			respondToWidth = sliderWidth;
+		} else if (_.respondTo === 'min') {
+			respondToWidth = Math.min(windowWidth, sliderWidth);
+		}
+		if (
+			_.options.responsive &&
+			_.options.responsive.length &&
+			_.options.responsive !== null
+		) {
+			targetBreakpoint = null;
+			for (breakpoint in _.breakpoints) {
+				if (_.breakpoints.hasOwnProperty(breakpoint)) {
+					if (_.originalSettings.mobileFirst === false) {
+						if (respondToWidth < _.breakpoints[breakpoint]) {
+							targetBreakpoint = _.breakpoints[breakpoint];
+						}
+					} else {
+						if (respondToWidth > _.breakpoints[breakpoint]) {
+							targetBreakpoint = _.breakpoints[breakpoint];
+						}
+					}
+				}
+			}
+			if (targetBreakpoint !== null) {
+				if (_.activeBreakpoint !== null) {
+					if (targetBreakpoint !== _.activeBreakpoint || forceUpdate) {
+						_.activeBreakpoint = targetBreakpoint;
+						if (_.breakpointSettings[targetBreakpoint] === 'unslick') {
+							_.unslick(targetBreakpoint);
+						} else {
+							_.options = $.extend(
+								{},
+								_.originalSettings,
+								_.breakpointSettings[targetBreakpoint]
+							);
+							if (initial === true) {
+								_.currentSlide = _.options.initialSlide;
+							}
+							_.refresh(initial);
+						}
+						triggerBreakpoint = targetBreakpoint;
+					}
+				} else {
+					_.activeBreakpoint = targetBreakpoint;
+					if (_.breakpointSettings[targetBreakpoint] === 'unslick') {
+						_.unslick(targetBreakpoint);
+					} else {
+						_.options = $.extend(
+							{},
+							_.originalSettings,
+							_.breakpointSettings[targetBreakpoint]
+						);
+						if (initial === true) {
+							_.currentSlide = _.options.initialSlide;
+						}
+						_.refresh(initial);
+					}
+					triggerBreakpoint = targetBreakpoint;
+				}
+			} else {
+				if (_.activeBreakpoint !== null) {
+					_.activeBreakpoint = null;
+					_.options = _.originalSettings;
+					if (initial === true) {
+						_.currentSlide = _.options.initialSlide;
+					}
+					_.refresh(initial);
+					triggerBreakpoint = targetBreakpoint;
+				}
+			}
+			if (!initial && triggerBreakpoint !== false) {
+				_.$slider.trigger('breakpoint', [_, triggerBreakpoint]);
+			}
+		}
+	};
+	Slick.prototype.changeSlide = function (event, dontAnimate) {
+		var _ = this,
+			$target = $(event.currentTarget),
+			indexOffset,
+			slideOffset,
+			unevenOffset;
+		if ($target.is('a')) {
+			event.preventDefault();
+		}
+		if (!$target.is('li')) {
+			$target = $target.closest('li');
+		}
+		unevenOffset = _.slideCount % _.options.slidesToScroll !== 0;
+		indexOffset = unevenOffset
+			? 0
+			: (_.slideCount - _.currentSlide) % _.options.slidesToScroll;
+		switch (event.data.message) {
+			case 'previous':
+				slideOffset =
+					indexOffset === 0
+						? _.options.slidesToScroll
+						: _.options.slidesToShow - indexOffset;
+				if (_.slideCount > _.options.slidesToShow) {
+					_.slideHandler(_.currentSlide - slideOffset, false, dontAnimate);
+				}
+				break;
+			case 'next':
+				slideOffset = indexOffset === 0 ? _.options.slidesToScroll : indexOffset;
+				if (_.slideCount > _.options.slidesToShow) {
+					_.slideHandler(_.currentSlide + slideOffset, false, dontAnimate);
+				}
+				break;
+			case 'index':
+				var index =
+					event.data.index === 0
+						? 0
+						: event.data.index || $target.index() * _.options.slidesToScroll;
+				_.slideHandler(_.checkNavigable(index), false, dontAnimate);
+				$target.children().trigger('focus');
+				break;
+			default:
+				return;
+		}
+	};
+	Slick.prototype.checkNavigable = function (index) {
+		var _ = this,
+			navigables,
+			prevNavigable;
+		navigables = _.getNavigableIndexes();
+		prevNavigable = 0;
+		if (index > navigables[navigables.length - 1]) {
+			index = navigables[navigables.length - 1];
+		} else {
+			for (var n in navigables) {
+				if (index < navigables[n]) {
+					index = prevNavigable;
+					break;
+				}
+				prevNavigable = navigables[n];
+			}
+		}
+		return index;
+	};
+	Slick.prototype.cleanUpEvents = function () {
+		var _ = this;
+		if (_.options.dots && _.$dots !== null) {
+			$('li', _.$dots)
+				.off('click.slick', _.changeSlide)
+				.off('mouseenter.slick', $.proxy(_.interrupt, _, true))
+				.off('mouseleave.slick', $.proxy(_.interrupt, _, false));
+			if (_.options.accessibility === true) {
+				_.$dots.off('keydown.slick', _.keyHandler);
+			}
+		}
+		_.$slider.off('focus.slick blur.slick');
+		if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+			_.$prevArrow && _.$prevArrow.off('click.slick', _.changeSlide);
+			_.$nextArrow && _.$nextArrow.off('click.slick', _.changeSlide);
+			if (_.options.accessibility === true) {
+				_.$prevArrow && _.$prevArrow.off('keydown.slick', _.keyHandler);
+				_.$nextArrow && _.$nextArrow.off('keydown.slick', _.keyHandler);
+			}
+		}
+		_.$list.off('touchstart.slick mousedown.slick', _.swipeHandler);
+		_.$list.off('touchmove.slick mousemove.slick', _.swipeHandler);
+		_.$list.off('touchend.slick mouseup.slick', _.swipeHandler);
+		_.$list.off('touchcancel.slick mouseleave.slick', _.swipeHandler);
+		_.$list.off('click.slick', _.clickHandler);
+		$(document).off(_.visibilityChange, _.visibility);
+		_.cleanUpSlideEvents();
+		if (_.options.accessibility === true) {
+			_.$list.off('keydown.slick', _.keyHandler);
+		}
+		if (_.options.focusOnSelect === true) {
+			$(_.$slideTrack).children().off('click.slick', _.selectHandler);
+		}
+		$(window).off(
+			'orientationchange.slick.slick-' + _.instanceUid,
+			_.orientationChange
+		);
+		$(window).off('resize.slick.slick-' + _.instanceUid, _.resize);
+		$('[draggable!=true]', _.$slideTrack).off('dragstart', _.preventDefault);
+		$(window).off('load.slick.slick-' + _.instanceUid, _.setPosition);
+	};
+	Slick.prototype.cleanUpSlideEvents = function () {
+		var _ = this;
+		_.$list.off('mouseenter.slick', $.proxy(_.interrupt, _, true));
+		_.$list.off('mouseleave.slick', $.proxy(_.interrupt, _, false));
+	};
+	Slick.prototype.cleanUpRows = function () {
+		var _ = this,
+			originalSlides;
+		if (_.options.rows > 0) {
+			originalSlides = _.$slides.children().children();
+			originalSlides.removeAttr('style');
+			_.$slider.empty().append(originalSlides);
+		}
+	};
+	Slick.prototype.clickHandler = function (event) {
+		var _ = this;
+		if (_.shouldClick === false) {
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+			event.preventDefault();
+		}
+	};
+	Slick.prototype.destroy = function (refresh) {
+		var _ = this;
+		_.autoPlayClear();
+		_.touchObject = {};
+		_.cleanUpEvents();
+		$('.slick-cloned', _.$slider).detach();
+		if (_.$dots) {
+			_.$dots.remove();
+		}
+		if (_.$prevArrow && _.$prevArrow.length) {
+			_.$prevArrow
+				.removeClass('slick-disabled slick-arrow slick-hidden')
+				.removeAttr('aria-hidden aria-disabled tabindex')
+				.css('display', '');
+			if (_.htmlExpr.test(_.options.prevArrow)) {
+				_.$prevArrow.remove();
+			}
+		}
+		if (_.$nextArrow && _.$nextArrow.length) {
+			_.$nextArrow
+				.removeClass('slick-disabled slick-arrow slick-hidden')
+				.removeAttr('aria-hidden aria-disabled tabindex')
+				.css('display', '');
+			if (_.htmlExpr.test(_.options.nextArrow)) {
+				_.$nextArrow.remove();
+			}
+		}
+		if (_.$slides) {
+			_.$slides
+				.removeClass(
+					'slick-slide slick-active slick-center slick-visible slick-current'
+				)
+				.removeAttr('aria-hidden')
+				.removeAttr('data-slick-index')
+				.each(function () {
+					$(this).attr('style', $(this).data('originalStyling'));
+				});
+			_.$slideTrack.children(this.options.slide).detach();
+			_.$slideTrack.detach();
+			_.$list.detach();
+			_.$slider.append(_.$slides);
+		}
+		_.cleanUpRows();
+		_.$slider.removeClass('slick-slider');
+		_.$slider.removeClass('slick-initialized');
+		_.$slider.removeClass('slick-dotted');
+		_.unslicked = true;
+		if (!refresh) {
+			_.$slider.trigger('destroy', [_]);
+		}
+	};
+	Slick.prototype.disableTransition = function (slide) {
+		var _ = this,
+			transition = {};
+		transition[_.transitionType] = '';
+		if (_.options.fade === false) {
+			_.$slideTrack.css(transition);
+		} else {
+			_.$slides.eq(slide).css(transition);
+		}
+	};
+	Slick.prototype.fadeSlide = function (slideIndex, callback) {
+		var _ = this;
+		if (_.cssTransitions === false) {
+			_.$slides.eq(slideIndex).css({ zIndex: _.options.zIndex });
+			_.$slides
+				.eq(slideIndex)
+				.animate({ opacity: 1 }, _.options.speed, _.options.easing, callback);
+		} else {
+			_.applyTransition(slideIndex);
+			_.$slides.eq(slideIndex).css({ opacity: 1, zIndex: _.options.zIndex });
+			if (callback) {
+				setTimeout(function () {
+					_.disableTransition(slideIndex);
+					callback.call();
+				}, _.options.speed);
+			}
+		}
+	};
+	Slick.prototype.fadeSlideOut = function (slideIndex) {
+		var _ = this;
+		if (_.cssTransitions === false) {
+			_.$slides
+				.eq(slideIndex)
+				.animate(
+					{ opacity: 0, zIndex: _.options.zIndex - 2 },
+					_.options.speed,
+					_.options.easing
+				);
+		} else {
+			_.applyTransition(slideIndex);
+			_.$slides.eq(slideIndex).css({ opacity: 0, zIndex: _.options.zIndex - 2 });
+		}
+	};
+	Slick.prototype.filterSlides = Slick.prototype.slickFilter = function (
+		filter
+	) {
+		var _ = this;
+		if (filter !== null) {
+			_.$slidesCache = _.$slides;
+			_.unload();
+			_.$slideTrack.children(this.options.slide).detach();
+			_.$slidesCache.filter(filter).appendTo(_.$slideTrack);
+			_.reinit();
+		}
+	};
+	Slick.prototype.focusHandler = function () {
+		var _ = this;
+		_.$slider
+			.off('focus.slick blur.slick')
+			.on('focus.slick', '*', function (event) {
+				var $sf = $(this);
+				setTimeout(function () {
+					if (_.options.pauseOnFocus) {
+						if ($sf.is(':focus')) {
+							_.focussed = true;
+							_.autoPlay();
+						}
+					}
+				}, 0);
+			})
+			.on('blur.slick', '*', function (event) {
+				var $sf = $(this);
+				if (_.options.pauseOnFocus) {
+					_.focussed = false;
+					_.autoPlay();
+				}
+			});
+	};
+	Slick.prototype.getCurrent = Slick.prototype.slickCurrentSlide = function () {
+		var _ = this;
+		return _.currentSlide;
+	};
+	Slick.prototype.getDotCount = function () {
+		var _ = this;
+		var breakPoint = 0;
+		var counter = 0;
+		var pagerQty = 0;
+		if (_.options.infinite === true) {
+			if (_.slideCount <= _.options.slidesToShow) {
+				++pagerQty;
+			} else {
+				while (breakPoint < _.slideCount) {
+					++pagerQty;
+					breakPoint = counter + _.options.slidesToScroll;
+					counter +=
+						_.options.slidesToScroll <= _.options.slidesToShow
+							? _.options.slidesToScroll
+							: _.options.slidesToShow;
+				}
+			}
+		} else if (_.options.centerMode === true) {
+			pagerQty = _.slideCount;
+		} else if (!_.options.asNavFor) {
+			pagerQty =
+				1 +
+				Math.ceil(
+					(_.slideCount - _.options.slidesToShow) / _.options.slidesToScroll
+				);
+		} else {
+			while (breakPoint < _.slideCount) {
+				++pagerQty;
+				breakPoint = counter + _.options.slidesToScroll;
+				counter +=
+					_.options.slidesToScroll <= _.options.slidesToShow
+						? _.options.slidesToScroll
+						: _.options.slidesToShow;
+			}
+		}
+		return pagerQty - 1;
+	};
+	Slick.prototype.getLeft = function (slideIndex) {
+		var _ = this,
+			targetLeft,
+			verticalHeight,
+			verticalOffset = 0,
+			targetSlide,
+			coef;
+		_.slideOffset = 0;
+		verticalHeight = _.$slides.first().outerHeight(true);
+		if (_.options.infinite === true) {
+			if (_.slideCount > _.options.slidesToShow) {
+				_.slideOffset = _.slideWidth * _.options.slidesToShow * -1;
+				coef = -1;
+				if (_.options.vertical === true && _.options.centerMode === true) {
+					if (_.options.slidesToShow === 2) {
+						coef = -1.5;
+					} else if (_.options.slidesToShow === 1) {
+						coef = -2;
+					}
+				}
+				verticalOffset = verticalHeight * _.options.slidesToShow * coef;
+			}
+			if (_.slideCount % _.options.slidesToScroll !== 0) {
+				if (
+					slideIndex + _.options.slidesToScroll > _.slideCount &&
+					_.slideCount > _.options.slidesToShow
+				) {
+					if (slideIndex > _.slideCount) {
+						_.slideOffset =
+							(_.options.slidesToShow - (slideIndex - _.slideCount)) *
+							_.slideWidth *
+							-1;
+						verticalOffset =
+							(_.options.slidesToShow - (slideIndex - _.slideCount)) *
+							verticalHeight *
+							-1;
+					} else {
+						_.slideOffset =
+							(_.slideCount % _.options.slidesToScroll) * _.slideWidth * -1;
+						verticalOffset =
+							(_.slideCount % _.options.slidesToScroll) * verticalHeight * -1;
+					}
+				}
+			}
+		} else {
+			if (slideIndex + _.options.slidesToShow > _.slideCount) {
+				_.slideOffset =
+					(slideIndex + _.options.slidesToShow - _.slideCount) * _.slideWidth;
+				verticalOffset =
+					(slideIndex + _.options.slidesToShow - _.slideCount) * verticalHeight;
+			}
+		}
+		if (_.slideCount <= _.options.slidesToShow) {
+			_.slideOffset = 0;
+			verticalOffset = 0;
+		}
+		if (_.options.centerMode === true && _.slideCount <= _.options.slidesToShow) {
+			_.slideOffset =
+				(_.slideWidth * Math.floor(_.options.slidesToShow)) / 2 -
+				(_.slideWidth * _.slideCount) / 2;
+		} else if (_.options.centerMode === true && _.options.infinite === true) {
+			_.slideOffset +=
+				_.slideWidth * Math.floor(_.options.slidesToShow / 2) - _.slideWidth;
+		} else if (_.options.centerMode === true) {
+			_.slideOffset = 0;
+			_.slideOffset += _.slideWidth * Math.floor(_.options.slidesToShow / 2);
+		}
+		if (_.options.vertical === false) {
+			targetLeft = slideIndex * _.slideWidth * -1 + _.slideOffset;
+		} else {
+			targetLeft = slideIndex * verticalHeight * -1 + verticalOffset;
+		}
+		if (_.options.variableWidth === true) {
+			if (_.slideCount <= _.options.slidesToShow || _.options.infinite === false) {
+				targetSlide = _.$slideTrack.children('.slick-slide').eq(slideIndex);
+			} else {
+				targetSlide = _.$slideTrack
+					.children('.slick-slide')
+					.eq(slideIndex + _.options.slidesToShow);
+			}
+			if (_.options.rtl === true) {
+				if (targetSlide[0]) {
+					targetLeft =
+						(_.$slideTrack.width() -
+							targetSlide[0].offsetLeft -
+							targetSlide.width()) *
+						-1;
+				} else {
+					targetLeft = 0;
+				}
+			} else {
+				targetLeft = targetSlide[0] ? targetSlide[0].offsetLeft * -1 : 0;
+			}
+			if (_.options.centerMode === true) {
+				if (
+					_.slideCount <= _.options.slidesToShow ||
+					_.options.infinite === false
+				) {
+					targetSlide = _.$slideTrack.children('.slick-slide').eq(slideIndex);
+				} else {
+					targetSlide = _.$slideTrack
+						.children('.slick-slide')
+						.eq(slideIndex + _.options.slidesToShow + 1);
+				}
+				if (_.options.rtl === true) {
+					if (targetSlide[0]) {
+						targetLeft =
+							(_.$slideTrack.width() -
+								targetSlide[0].offsetLeft -
+								targetSlide.width()) *
+							-1;
+					} else {
+						targetLeft = 0;
+					}
+				} else {
+					targetLeft = targetSlide[0] ? targetSlide[0].offsetLeft * -1 : 0;
+				}
+				targetLeft += (_.$list.width() - targetSlide.outerWidth()) / 2;
+			}
+		}
+		return targetLeft;
+	};
+	Slick.prototype.getOption = Slick.prototype.slickGetOption = function (
+		option
+	) {
+		var _ = this;
+		return _.options[option];
+	};
+	Slick.prototype.getNavigableIndexes = function () {
+		var _ = this,
+			breakPoint = 0,
+			counter = 0,
+			indexes = [],
+			max;
+		if (_.options.infinite === false) {
+			max = _.slideCount;
+		} else {
+			breakPoint = _.options.slidesToScroll * -1;
+			counter = _.options.slidesToScroll * -1;
+			max = _.slideCount * 2;
+		}
+		while (breakPoint < max) {
+			indexes.push(breakPoint);
+			breakPoint = counter + _.options.slidesToScroll;
+			counter +=
+				_.options.slidesToScroll <= _.options.slidesToShow
+					? _.options.slidesToScroll
+					: _.options.slidesToShow;
+		}
+		return indexes;
+	};
+	Slick.prototype.getSlick = function () {
+		return this;
+	};
+	Slick.prototype.getSlideCount = function () {
+		var _ = this,
+			slidesTraversed,
+			swipedSlide,
+			swipeTarget,
+			centerOffset;
+		centerOffset =
+			_.options.centerMode === true ? Math.floor(_.$list.width() / 2) : 0;
+		swipeTarget = _.swipeLeft * -1 + centerOffset;
+		if (_.options.swipeToSlide === true) {
+			_.$slideTrack.find('.slick-slide').each(function (index, slide) {
+				var slideOuterWidth, slideOffset, slideRightBoundary;
+				slideOuterWidth = $(slide).outerWidth();
+				slideOffset = slide.offsetLeft;
+				if (_.options.centerMode !== true) {
+					slideOffset += slideOuterWidth / 2;
+				}
+				slideRightBoundary = slideOffset + slideOuterWidth;
+				if (swipeTarget < slideRightBoundary) {
+					swipedSlide = slide;
+					return false;
+				}
+			});
+			slidesTraversed =
+				Math.abs($(swipedSlide).attr('data-slick-index') - _.currentSlide) || 1;
+			return slidesTraversed;
+		} else {
+			return _.options.slidesToScroll;
+		}
+	};
+	Slick.prototype.goTo = Slick.prototype.slickGoTo = function (
+		slide,
+		dontAnimate
+	) {
+		var _ = this;
+		_.changeSlide(
+			{ data: { message: 'index', index: parseInt(slide) } },
+			dontAnimate
+		);
+	};
+	Slick.prototype.init = function (creation) {
+		var _ = this;
+		if (!$(_.$slider).hasClass('slick-initialized')) {
+			$(_.$slider).addClass('slick-initialized');
+			_.buildRows();
+			_.buildOut();
+			_.setProps();
+			_.startLoad();
+			_.loadSlider();
+			_.initializeEvents();
+			_.updateArrows();
+			_.updateDots();
+			_.checkResponsive(true);
+			_.focusHandler();
+		}
+		if (creation) {
+			_.$slider.trigger('init', [_]);
+		}
+		if (_.options.accessibility === true) {
+			_.initADA();
+		}
+		if (_.options.autoplay) {
+			_.paused = false;
+			_.autoPlay();
+		}
+	};
+	Slick.prototype.initADA = function () {
+		var _ = this,
+			numDotGroups = Math.ceil(_.slideCount / _.options.slidesToShow),
+			tabControlIndexes = _.getNavigableIndexes().filter(function (val) {
+				return val >= 0 && val < _.slideCount;
+			});
+		_.$slides
+			.add(_.$slideTrack.find('.slick-cloned'))
+			.attr({ 'aria-hidden': 'true', tabindex: '-1' })
+			.find('a, input, button, select')
+			.attr({ tabindex: '-1' });
+		if (_.$dots !== null) {
+			_.$slides.not(_.$slideTrack.find('.slick-cloned')).each(function (i) {
+				var slideControlIndex = tabControlIndexes.indexOf(i);
+				$(this).attr({
+					role: 'tabpanel',
+					id: 'slick-slide' + _.instanceUid + i,
+					tabindex: -1,
+				});
+				if (slideControlIndex !== -1) {
+					var ariaButtonControl =
+						'slick-slide-control' + _.instanceUid + slideControlIndex;
+					if ($('#' + ariaButtonControl).length) {
+						$(this).attr({ 'aria-describedby': ariaButtonControl });
+					}
+				}
+			});
+			_.$dots
+				.attr('role', 'tablist')
+				.find('li')
+				.each(function (i) {
+					var mappedSlideIndex = tabControlIndexes[i];
+					$(this).attr({ role: 'presentation' });
+					$(this)
+						.find('button')
+						.first()
+						.attr({
+							role: 'tab',
+							id: 'slick-slide-control' + _.instanceUid + i,
+							'aria-controls': 'slick-slide' + _.instanceUid + mappedSlideIndex,
+							'aria-label': i + 1 + ' of ' + numDotGroups,
+							'aria-selected': null,
+							tabindex: '-1',
+						});
+				})
+				.eq(_.currentSlide)
+				.find('button')
+				.attr({ 'aria-selected': 'true', tabindex: '0' })
+				.end();
+		}
+		for (var i = _.currentSlide, max = i + _.options.slidesToShow; i < max; i++) {
+			if (_.options.focusOnChange) {
+				_.$slides.eq(i).attr({ tabindex: '0' });
+			} else {
+				_.$slides.eq(i).removeAttr('tabindex');
+			}
+		}
+		_.activateADA();
+	};
+	Slick.prototype.initArrowEvents = function () {
+		var _ = this;
+		if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+			_.$prevArrow
+				.off('click.slick')
+				.on('click.slick', { message: 'previous' }, _.changeSlide);
+			_.$nextArrow
+				.off('click.slick')
+				.on('click.slick', { message: 'next' }, _.changeSlide);
+			if (_.options.accessibility === true) {
+				_.$prevArrow.on('keydown.slick', _.keyHandler);
+				_.$nextArrow.on('keydown.slick', _.keyHandler);
+			}
+		}
+	};
+	Slick.prototype.initDotEvents = function () {
+		var _ = this;
+		if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+			$('li', _.$dots).on('click.slick', { message: 'index' }, _.changeSlide);
+			if (_.options.accessibility === true) {
+				_.$dots.on('keydown.slick', _.keyHandler);
+			}
+		}
+		if (
+			_.options.dots === true &&
+			_.options.pauseOnDotsHover === true &&
+			_.slideCount > _.options.slidesToShow
+		) {
+			$('li', _.$dots)
+				.on('mouseenter.slick', $.proxy(_.interrupt, _, true))
+				.on('mouseleave.slick', $.proxy(_.interrupt, _, false));
+		}
+	};
+	Slick.prototype.initSlideEvents = function () {
+		var _ = this;
+		if (_.options.pauseOnHover) {
+			_.$list.on('mouseenter.slick', $.proxy(_.interrupt, _, true));
+			_.$list.on('mouseleave.slick', $.proxy(_.interrupt, _, false));
+		}
+	};
+	Slick.prototype.initializeEvents = function () {
+		var _ = this;
+		_.initArrowEvents();
+		_.initDotEvents();
+		_.initSlideEvents();
+		_.$list.on(
+			'touchstart.slick mousedown.slick',
+			{ action: 'start' },
+			_.swipeHandler
+		);
+		_.$list.on(
+			'touchmove.slick mousemove.slick',
+			{ action: 'move' },
+			_.swipeHandler
+		);
+		_.$list.on('touchend.slick mouseup.slick', { action: 'end' }, _.swipeHandler);
+		_.$list.on(
+			'touchcancel.slick mouseleave.slick',
+			{ action: 'end' },
+			_.swipeHandler
+		);
+		_.$list.on('click.slick', _.clickHandler);
+		$(document).on(_.visibilityChange, $.proxy(_.visibility, _));
+		if (_.options.accessibility === true) {
+			_.$list.on('keydown.slick', _.keyHandler);
+		}
+		if (_.options.focusOnSelect === true) {
+			$(_.$slideTrack).children().on('click.slick', _.selectHandler);
+		}
+		$(window).on(
+			'orientationchange.slick.slick-' + _.instanceUid,
+			$.proxy(_.orientationChange, _)
+		);
+		$(window).on('resize.slick.slick-' + _.instanceUid, $.proxy(_.resize, _));
+		$('[draggable!=true]', _.$slideTrack).on('dragstart', _.preventDefault);
+		$(window).on('load.slick.slick-' + _.instanceUid, _.setPosition);
+		$(_.setPosition);
+	};
+	Slick.prototype.initUI = function () {
+		var _ = this;
+		if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+			_.$prevArrow.show();
+			_.$nextArrow.show();
+		}
+		if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+			_.$dots.show();
+		}
+	};
+	Slick.prototype.keyHandler = function (event) {
+		var _ = this;
+		if (!event.target.tagName.match('TEXTAREA|INPUT|SELECT')) {
+			if (event.keyCode === 37 && _.options.accessibility === true) {
+				_.changeSlide({
+					data: { message: _.options.rtl === true ? 'next' : 'previous' },
+				});
+			} else if (event.keyCode === 39 && _.options.accessibility === true) {
+				_.changeSlide({
+					data: { message: _.options.rtl === true ? 'previous' : 'next' },
+				});
+			}
+		}
+	};
+	Slick.prototype.lazyLoad = function () {
+		var _ = this,
+			loadRange,
+			cloneRange,
+			rangeStart,
+			rangeEnd;
+		function loadImages(imagesScope) {
+			$('img[data-lazy]', imagesScope).each(function () {
+				var image = $(this),
+					imageSource = $(this).attr('data-lazy'),
+					imageSrcSet = $(this).attr('data-srcset'),
+					imageSizes = $(this).attr('data-sizes') || _.$slider.attr('data-sizes'),
+					imageToLoad = document.createElement('img');
+				imageToLoad.onload = function () {
+					image.animate({ opacity: 0 }, 100, function () {
+						if (imageSrcSet) {
+							image.attr('srcset', imageSrcSet);
+							if (imageSizes) {
+								image.attr('sizes', imageSizes);
+							}
+						}
+						image.attr('src', imageSource).animate({ opacity: 1 }, 200, function () {
+							image
+								.removeAttr('data-lazy data-srcset data-sizes')
+								.removeClass('slick-loading');
+						});
+						_.$slider.trigger('lazyLoaded', [_, image, imageSource]);
 					});
-			},
-			add: function () {
-				(s = e[t]._c), (i = e[t]._d), (a = e[t]._e), s.add('toggle check');
-			},
-			clickAnchor: function (e, t) {},
-		}),
-			(e[t].configuration.classNames[n] = { toggle: 'Toggle', check: 'Check' });
-		var s, i, a, o;
-	})(jQuery);
+				};
+				imageToLoad.onerror = function () {
+					image
+						.removeAttr('data-lazy')
+						.removeClass('slick-loading')
+						.addClass('slick-lazyload-error');
+					_.$slider.trigger('lazyLoadError', [_, image, imageSource]);
+				};
+				imageToLoad.src = imageSource;
+			});
+		}
+		if (_.options.centerMode === true) {
+			if (_.options.infinite === true) {
+				rangeStart = _.currentSlide + (_.options.slidesToShow / 2 + 1);
+				rangeEnd = rangeStart + _.options.slidesToShow + 2;
+			} else {
+				rangeStart = Math.max(0, _.currentSlide - (_.options.slidesToShow / 2 + 1));
+				rangeEnd = 2 + (_.options.slidesToShow / 2 + 1) + _.currentSlide;
+			}
+		} else {
+			rangeStart = _.options.infinite
+				? _.options.slidesToShow + _.currentSlide
+				: _.currentSlide;
+			rangeEnd = Math.ceil(rangeStart + _.options.slidesToShow);
+			if (_.options.fade === true) {
+				if (rangeStart > 0) rangeStart--;
+				if (rangeEnd <= _.slideCount) rangeEnd++;
+			}
+		}
+		loadRange = _.$slider.find('.slick-slide').slice(rangeStart, rangeEnd);
+		if (_.options.lazyLoad === 'anticipated') {
+			var prevSlide = rangeStart - 1,
+				nextSlide = rangeEnd,
+				$slides = _.$slider.find('.slick-slide');
+			for (var i = 0; i < _.options.slidesToScroll; i++) {
+				if (prevSlide < 0) prevSlide = _.slideCount - 1;
+				loadRange = loadRange.add($slides.eq(prevSlide));
+				loadRange = loadRange.add($slides.eq(nextSlide));
+				prevSlide--;
+				nextSlide++;
+			}
+		}
+		loadImages(loadRange);
+		if (_.slideCount <= _.options.slidesToShow) {
+			cloneRange = _.$slider.find('.slick-slide');
+			loadImages(cloneRange);
+		} else if (_.currentSlide >= _.slideCount - _.options.slidesToShow) {
+			cloneRange = _.$slider
+				.find('.slick-cloned')
+				.slice(0, _.options.slidesToShow);
+			loadImages(cloneRange);
+		} else if (_.currentSlide === 0) {
+			cloneRange = _.$slider
+				.find('.slick-cloned')
+				.slice(_.options.slidesToShow * -1);
+			loadImages(cloneRange);
+		}
+	};
+	Slick.prototype.loadSlider = function () {
+		var _ = this;
+		_.setPosition();
+		_.$slideTrack.css({ opacity: 1 });
+		_.$slider.removeClass('slick-loading');
+		_.initUI();
+		if (_.options.lazyLoad === 'progressive') {
+			_.progressiveLazyLoad();
+		}
+	};
+	Slick.prototype.next = Slick.prototype.slickNext = function () {
+		var _ = this;
+		_.changeSlide({ data: { message: 'next' } });
+	};
+	Slick.prototype.orientationChange = function () {
+		var _ = this;
+		_.checkResponsive();
+		_.setPosition();
+	};
+	Slick.prototype.pause = Slick.prototype.slickPause = function () {
+		var _ = this;
+		_.autoPlayClear();
+		_.paused = true;
+	};
+	Slick.prototype.play = Slick.prototype.slickPlay = function () {
+		var _ = this;
+		_.autoPlay();
+		_.options.autoplay = true;
+		_.paused = false;
+		_.focussed = false;
+		_.interrupted = false;
+	};
+	Slick.prototype.postSlide = function (index) {
+		var _ = this;
+		if (!_.unslicked) {
+			_.$slider.trigger('afterChange', [_, index]);
+			_.animating = false;
+			if (_.slideCount > _.options.slidesToShow) {
+				_.setPosition();
+			}
+			_.swipeLeft = null;
+			if (_.options.autoplay) {
+				_.autoPlay();
+			}
+			if (_.options.accessibility === true) {
+				_.initADA();
+				if (_.options.focusOnChange) {
+					var $currentSlide = $(_.$slides.get(_.currentSlide));
+					$currentSlide.attr('tabindex', 0).focus();
+				}
+			}
+		}
+	};
+	Slick.prototype.prev = Slick.prototype.slickPrev = function () {
+		var _ = this;
+		_.changeSlide({ data: { message: 'previous' } });
+	};
+	Slick.prototype.preventDefault = function (event) {
+		event.preventDefault();
+	};
+	Slick.prototype.progressiveLazyLoad = function (tryCount) {
+		tryCount = tryCount || 1;
+		var _ = this,
+			$imgsToLoad = $('img[data-lazy]', _.$slider),
+			image,
+			imageSource,
+			imageSrcSet,
+			imageSizes,
+			imageToLoad;
+		if ($imgsToLoad.length) {
+			image = $imgsToLoad.first();
+			imageSource = image.attr('data-lazy');
+			imageSrcSet = image.attr('data-srcset');
+			imageSizes = image.attr('data-sizes') || _.$slider.attr('data-sizes');
+			imageToLoad = document.createElement('img');
+			imageToLoad.onload = function () {
+				if (imageSrcSet) {
+					image.attr('srcset', imageSrcSet);
+					if (imageSizes) {
+						image.attr('sizes', imageSizes);
+					}
+				}
+				image
+					.attr('src', imageSource)
+					.removeAttr('data-lazy data-srcset data-sizes')
+					.removeClass('slick-loading');
+				if (_.options.adaptiveHeight === true) {
+					_.setPosition();
+				}
+				_.$slider.trigger('lazyLoaded', [_, image, imageSource]);
+				_.progressiveLazyLoad();
+			};
+			imageToLoad.onerror = function () {
+				if (tryCount < 3) {
+					setTimeout(function () {
+						_.progressiveLazyLoad(tryCount + 1);
+					}, 500);
+				} else {
+					image
+						.removeAttr('data-lazy')
+						.removeClass('slick-loading')
+						.addClass('slick-lazyload-error');
+					_.$slider.trigger('lazyLoadError', [_, image, imageSource]);
+					_.progressiveLazyLoad();
+				}
+			};
+			imageToLoad.src = imageSource;
+		} else {
+			_.$slider.trigger('allImagesLoaded', [_]);
+		}
+	};
+	Slick.prototype.refresh = function (initializing) {
+		var _ = this,
+			currentSlide,
+			lastVisibleIndex;
+		lastVisibleIndex = _.slideCount - _.options.slidesToShow;
+		if (!_.options.infinite && _.currentSlide > lastVisibleIndex) {
+			_.currentSlide = lastVisibleIndex;
+		}
+		if (_.slideCount <= _.options.slidesToShow) {
+			_.currentSlide = 0;
+		}
+		currentSlide = _.currentSlide;
+		_.destroy(true);
+		$.extend(_, _.initials, { currentSlide: currentSlide });
+		_.init();
+		if (!initializing) {
+			_.changeSlide({ data: { message: 'index', index: currentSlide } }, false);
+		}
+	};
+	Slick.prototype.registerBreakpoints = function () {
+		var _ = this,
+			breakpoint,
+			currentBreakpoint,
+			l,
+			responsiveSettings = _.options.responsive || null;
+		if ($.type(responsiveSettings) === 'array' && responsiveSettings.length) {
+			_.respondTo = _.options.respondTo || 'window';
+			for (breakpoint in responsiveSettings) {
+				l = _.breakpoints.length - 1;
+				if (responsiveSettings.hasOwnProperty(breakpoint)) {
+					currentBreakpoint = responsiveSettings[breakpoint].breakpoint;
+					while (l >= 0) {
+						if (_.breakpoints[l] && _.breakpoints[l] === currentBreakpoint) {
+							_.breakpoints.splice(l, 1);
+						}
+						l--;
+					}
+					_.breakpoints.push(currentBreakpoint);
+					_.breakpointSettings[currentBreakpoint] =
+						responsiveSettings[breakpoint].settings;
+				}
+			}
+			_.breakpoints.sort(function (a, b) {
+				return _.options.mobileFirst ? a - b : b - a;
+			});
+		}
+	};
+	Slick.prototype.reinit = function () {
+		var _ = this;
+		_.$slides = _.$slideTrack.children(_.options.slide).addClass('slick-slide');
+		_.slideCount = _.$slides.length;
+		if (_.currentSlide >= _.slideCount && _.currentSlide !== 0) {
+			_.currentSlide = _.currentSlide - _.options.slidesToScroll;
+		}
+		if (_.slideCount <= _.options.slidesToShow) {
+			_.currentSlide = 0;
+		}
+		_.registerBreakpoints();
+		_.setProps();
+		_.setupInfinite();
+		_.buildArrows();
+		_.updateArrows();
+		_.initArrowEvents();
+		_.buildDots();
+		_.updateDots();
+		_.initDotEvents();
+		_.cleanUpSlideEvents();
+		_.initSlideEvents();
+		_.checkResponsive(false, true);
+		if (_.options.focusOnSelect === true) {
+			$(_.$slideTrack).children().on('click.slick', _.selectHandler);
+		}
+		_.setSlideClasses(typeof _.currentSlide === 'number' ? _.currentSlide : 0);
+		_.setPosition();
+		_.focusHandler();
+		_.paused = !_.options.autoplay;
+		_.autoPlay();
+		_.$slider.trigger('reInit', [_]);
+	};
+	Slick.prototype.resize = function () {
+		var _ = this;
+		if ($(window).width() !== _.windowWidth) {
+			clearTimeout(_.windowDelay);
+			_.windowDelay = window.setTimeout(function () {
+				_.windowWidth = $(window).width();
+				_.checkResponsive();
+				if (!_.unslicked) {
+					_.setPosition();
+				}
+			}, 50);
+		}
+	};
+	Slick.prototype.removeSlide = Slick.prototype.slickRemove = function (
+		index,
+		removeBefore,
+		removeAll
+	) {
+		var _ = this;
+		if (typeof index === 'boolean') {
+			removeBefore = index;
+			index = removeBefore === true ? 0 : _.slideCount - 1;
+		} else {
+			index = removeBefore === true ? --index : index;
+		}
+		if (_.slideCount < 1 || index < 0 || index > _.slideCount - 1) {
+			return false;
+		}
+		_.unload();
+		if (removeAll === true) {
+			_.$slideTrack.children().remove();
+		} else {
+			_.$slideTrack.children(this.options.slide).eq(index).remove();
+		}
+		_.$slides = _.$slideTrack.children(this.options.slide);
+		_.$slideTrack.children(this.options.slide).detach();
+		_.$slideTrack.append(_.$slides);
+		_.$slidesCache = _.$slides;
+		_.reinit();
+	};
+	Slick.prototype.setCSS = function (position) {
+		var _ = this,
+			positionProps = {},
+			x,
+			y;
+		if (_.options.rtl === true) {
+			position = -position;
+		}
+		x = _.positionProp == 'left' ? Math.ceil(position) + 'px' : '0px';
+		y = _.positionProp == 'top' ? Math.ceil(position) + 'px' : '0px';
+		positionProps[_.positionProp] = position;
+		if (_.transformsEnabled === false) {
+			_.$slideTrack.css(positionProps);
+		} else {
+			positionProps = {};
+			if (_.cssTransitions === false) {
+				positionProps[_.animType] = 'translate(' + x + ', ' + y + ')';
+				_.$slideTrack.css(positionProps);
+			} else {
+				positionProps[_.animType] = 'translate3d(' + x + ', ' + y + ', 0px)';
+				_.$slideTrack.css(positionProps);
+			}
+		}
+	};
+	Slick.prototype.setDimensions = function () {
+		var _ = this;
+		if (_.options.vertical === false) {
+			if (_.options.centerMode === true) {
+				_.$list.css({ padding: '0px ' + _.options.centerPadding });
+			}
+		} else {
+			_.$list.height(_.$slides.first().outerHeight(true) * _.options.slidesToShow);
+			if (_.options.centerMode === true) {
+				_.$list.css({ padding: _.options.centerPadding + ' 0px' });
+			}
+		}
+		_.listWidth = _.$list.width();
+		_.listHeight = _.$list.height();
+		if (_.options.vertical === false && _.options.variableWidth === false) {
+			_.slideWidth = Math.ceil(_.listWidth / _.options.slidesToShow);
+			_.$slideTrack.width(
+				Math.ceil(_.slideWidth * _.$slideTrack.children('.slick-slide').length)
+			);
+		} else if (_.options.variableWidth === true) {
+			_.$slideTrack.width(5e3 * _.slideCount);
+		} else {
+			_.slideWidth = Math.ceil(_.listWidth);
+			_.$slideTrack.height(
+				Math.ceil(
+					_.$slides.first().outerHeight(true) *
+						_.$slideTrack.children('.slick-slide').length
+				)
+			);
+		}
+		var offset = _.$slides.first().outerWidth(true) - _.$slides.first().width();
+		if (_.options.variableWidth === false)
+			_.$slideTrack.children('.slick-slide').width(_.slideWidth - offset);
+	};
+	Slick.prototype.setFade = function () {
+		var _ = this,
+			targetLeft;
+		_.$slides.each(function (index, element) {
+			targetLeft = _.slideWidth * index * -1;
+			if (_.options.rtl === true) {
+				$(element).css({
+					position: 'relative',
+					right: targetLeft,
+					top: 0,
+					zIndex: _.options.zIndex - 2,
+					opacity: 0,
+				});
+			} else {
+				$(element).css({
+					position: 'relative',
+					left: targetLeft,
+					top: 0,
+					zIndex: _.options.zIndex - 2,
+					opacity: 0,
+				});
+			}
+		});
+		_.$slides
+			.eq(_.currentSlide)
+			.css({ zIndex: _.options.zIndex - 1, opacity: 1 });
+	};
+	Slick.prototype.setHeight = function () {
+		var _ = this;
+		if (
+			_.options.slidesToShow === 1 &&
+			_.options.adaptiveHeight === true &&
+			_.options.vertical === false
+		) {
+			var targetHeight = _.$slides.eq(_.currentSlide).outerHeight(true);
+			_.$list.css('height', targetHeight);
+		}
+	};
+	Slick.prototype.setOption = Slick.prototype.slickSetOption = function () {
+		var _ = this,
+			l,
+			item,
+			option,
+			value,
+			refresh = false,
+			type;
+		if ($.type(arguments[0]) === 'object') {
+			option = arguments[0];
+			refresh = arguments[1];
+			type = 'multiple';
+		} else if ($.type(arguments[0]) === 'string') {
+			option = arguments[0];
+			value = arguments[1];
+			refresh = arguments[2];
+			if (arguments[0] === 'responsive' && $.type(arguments[1]) === 'array') {
+				type = 'responsive';
+			} else if (typeof arguments[1] !== 'undefined') {
+				type = 'single';
+			}
+		}
+		if (type === 'single') {
+			_.options[option] = value;
+		} else if (type === 'multiple') {
+			$.each(option, function (opt, val) {
+				_.options[opt] = val;
+			});
+		} else if (type === 'responsive') {
+			for (item in value) {
+				if ($.type(_.options.responsive) !== 'array') {
+					_.options.responsive = [value[item]];
+				} else {
+					l = _.options.responsive.length - 1;
+					while (l >= 0) {
+						if (_.options.responsive[l].breakpoint === value[item].breakpoint) {
+							_.options.responsive.splice(l, 1);
+						}
+						l--;
+					}
+					_.options.responsive.push(value[item]);
+				}
+			}
+		}
+		if (refresh) {
+			_.unload();
+			_.reinit();
+		}
+	};
+	Slick.prototype.setPosition = function () {
+		var _ = this;
+		_.setDimensions();
+		_.setHeight();
+		if (_.options.fade === false) {
+			_.setCSS(_.getLeft(_.currentSlide));
+		} else {
+			_.setFade();
+		}
+		_.$slider.trigger('setPosition', [_]);
+	};
+	Slick.prototype.setProps = function () {
+		var _ = this,
+			bodyStyle = document.body.style;
+		_.positionProp = _.options.vertical === true ? 'top' : 'left';
+		if (_.positionProp === 'top') {
+			_.$slider.addClass('slick-vertical');
+		} else {
+			_.$slider.removeClass('slick-vertical');
+		}
+		if (
+			bodyStyle.WebkitTransition !== undefined ||
+			bodyStyle.MozTransition !== undefined ||
+			bodyStyle.msTransition !== undefined
+		) {
+			if (_.options.useCSS === true) {
+				_.cssTransitions = true;
+			}
+		}
+		if (_.options.fade) {
+			if (typeof _.options.zIndex === 'number') {
+				if (_.options.zIndex < 3) {
+					_.options.zIndex = 3;
+				}
+			} else {
+				_.options.zIndex = _.defaults.zIndex;
+			}
+		}
+		if (bodyStyle.OTransform !== undefined) {
+			_.animType = 'OTransform';
+			_.transformType = '-o-transform';
+			_.transitionType = 'OTransition';
+			if (
+				bodyStyle.perspectiveProperty === undefined &&
+				bodyStyle.webkitPerspective === undefined
+			)
+				_.animType = false;
+		}
+		if (bodyStyle.MozTransform !== undefined) {
+			_.animType = 'MozTransform';
+			_.transformType = '-moz-transform';
+			_.transitionType = 'MozTransition';
+			if (
+				bodyStyle.perspectiveProperty === undefined &&
+				bodyStyle.MozPerspective === undefined
+			)
+				_.animType = false;
+		}
+		if (bodyStyle.webkitTransform !== undefined) {
+			_.animType = 'webkitTransform';
+			_.transformType = '-webkit-transform';
+			_.transitionType = 'webkitTransition';
+			if (
+				bodyStyle.perspectiveProperty === undefined &&
+				bodyStyle.webkitPerspective === undefined
+			)
+				_.animType = false;
+		}
+		if (bodyStyle.msTransform !== undefined) {
+			_.animType = 'msTransform';
+			_.transformType = '-ms-transform';
+			_.transitionType = 'msTransition';
+			if (bodyStyle.msTransform === undefined) _.animType = false;
+		}
+		if (bodyStyle.transform !== undefined && _.animType !== false) {
+			_.animType = 'transform';
+			_.transformType = 'transform';
+			_.transitionType = 'transition';
+		}
+		_.transformsEnabled =
+			_.options.useTransform && _.animType !== null && _.animType !== false;
+	};
+	Slick.prototype.setSlideClasses = function (index) {
+		var _ = this,
+			centerOffset,
+			allSlides,
+			indexOffset,
+			remainder;
+		allSlides = _.$slider
+			.find('.slick-slide')
+			.removeClass('slick-active slick-center slick-current')
+			.attr('aria-hidden', 'true');
+		_.$slides.eq(index).addClass('slick-current');
+		if (_.options.centerMode === true) {
+			var evenCoef = _.options.slidesToShow % 2 === 0 ? 1 : 0;
+			centerOffset = Math.floor(_.options.slidesToShow / 2);
+			if (_.options.infinite === true) {
+				if (index >= centerOffset && index <= _.slideCount - 1 - centerOffset) {
+					_.$slides
+						.slice(index - centerOffset + evenCoef, index + centerOffset + 1)
+						.addClass('slick-active')
+						.attr('aria-hidden', 'false');
+				} else {
+					indexOffset = _.options.slidesToShow + index;
+					allSlides
+						.slice(
+							indexOffset - centerOffset + 1 + evenCoef,
+							indexOffset + centerOffset + 2
+						)
+						.addClass('slick-active')
+						.attr('aria-hidden', 'false');
+				}
+				if (index === 0) {
+					allSlides
+						.eq(allSlides.length - 1 - _.options.slidesToShow)
+						.addClass('slick-center');
+				} else if (index === _.slideCount - 1) {
+					allSlides.eq(_.options.slidesToShow).addClass('slick-center');
+				}
+			}
+			_.$slides.eq(index).addClass('slick-center');
+		} else {
+			if (index >= 0 && index <= _.slideCount - _.options.slidesToShow) {
+				_.$slides
+					.slice(index, index + _.options.slidesToShow)
+					.addClass('slick-active')
+					.attr('aria-hidden', 'false');
+			} else if (allSlides.length <= _.options.slidesToShow) {
+				allSlides.addClass('slick-active').attr('aria-hidden', 'false');
+			} else {
+				remainder = _.slideCount % _.options.slidesToShow;
+				indexOffset =
+					_.options.infinite === true ? _.options.slidesToShow + index : index;
+				if (
+					_.options.slidesToShow == _.options.slidesToScroll &&
+					_.slideCount - index < _.options.slidesToShow
+				) {
+					allSlides
+						.slice(
+							indexOffset - (_.options.slidesToShow - remainder),
+							indexOffset + remainder
+						)
+						.addClass('slick-active')
+						.attr('aria-hidden', 'false');
+				} else {
+					allSlides
+						.slice(indexOffset, indexOffset + _.options.slidesToShow)
+						.addClass('slick-active')
+						.attr('aria-hidden', 'false');
+				}
+			}
+		}
+		if (
+			_.options.lazyLoad === 'ondemand' ||
+			_.options.lazyLoad === 'anticipated'
+		) {
+			_.lazyLoad();
+		}
+	};
+	Slick.prototype.setupInfinite = function () {
+		var _ = this,
+			i,
+			slideIndex,
+			infiniteCount;
+		if (_.options.fade === true) {
+			_.options.centerMode = false;
+		}
+		if (_.options.infinite === true && _.options.fade === false) {
+			slideIndex = null;
+			if (_.slideCount > _.options.slidesToShow) {
+				if (_.options.centerMode === true) {
+					infiniteCount = _.options.slidesToShow + 1;
+				} else {
+					infiniteCount = _.options.slidesToShow;
+				}
+				for (i = _.slideCount; i > _.slideCount - infiniteCount; i -= 1) {
+					slideIndex = i - 1;
+					$(_.$slides[slideIndex])
+						.clone(true)
+						.attr('id', '')
+						.attr('data-slick-index', slideIndex - _.slideCount)
+						.prependTo(_.$slideTrack)
+						.addClass('slick-cloned');
+				}
+				for (i = 0; i < infiniteCount + _.slideCount; i += 1) {
+					slideIndex = i;
+					$(_.$slides[slideIndex])
+						.clone(true)
+						.attr('id', '')
+						.attr('data-slick-index', slideIndex + _.slideCount)
+						.appendTo(_.$slideTrack)
+						.addClass('slick-cloned');
+				}
+				_.$slideTrack
+					.find('.slick-cloned')
+					.find('[id]')
+					.each(function () {
+						$(this).attr('id', '');
+					});
+			}
+		}
+	};
+	Slick.prototype.interrupt = function (toggle) {
+		var _ = this;
+		if (!toggle) {
+			_.autoPlay();
+		}
+		_.interrupted = toggle;
+	};
+	Slick.prototype.selectHandler = function (event) {
+		var _ = this;
+		var targetElement = $(event.target).is('.slick-slide')
+			? $(event.target)
+			: $(event.target).parents('.slick-slide');
+		var index = parseInt(targetElement.attr('data-slick-index'));
+		if (!index) index = 0;
+		if (_.slideCount <= _.options.slidesToShow) {
+			_.slideHandler(index, false, true);
+			return;
+		}
+		_.slideHandler(index);
+	};
+	Slick.prototype.slideHandler = function (index, sync, dontAnimate) {
+		var targetSlide,
+			animSlide,
+			oldSlide,
+			slideLeft,
+			targetLeft = null,
+			_ = this,
+			navTarget;
+		sync = sync || false;
+		if (_.animating === true && _.options.waitForAnimate === true) {
+			return;
+		}
+		if (_.options.fade === true && _.currentSlide === index) {
+			return;
+		}
+		if (sync === false) {
+			_.asNavFor(index);
+		}
+		targetSlide = index;
+		targetLeft = _.getLeft(targetSlide);
+		slideLeft = _.getLeft(_.currentSlide);
+		_.currentLeft = _.swipeLeft === null ? slideLeft : _.swipeLeft;
+		if (
+			_.options.infinite === false &&
+			_.options.centerMode === false &&
+			(index < 0 || index > _.getDotCount() * _.options.slidesToScroll)
+		) {
+			if (_.options.fade === false) {
+				targetSlide = _.currentSlide;
+				if (dontAnimate !== true && _.slideCount > _.options.slidesToShow) {
+					_.animateSlide(slideLeft, function () {
+						_.postSlide(targetSlide);
+					});
+				} else {
+					_.postSlide(targetSlide);
+				}
+			}
+			return;
+		} else if (
+			_.options.infinite === false &&
+			_.options.centerMode === true &&
+			(index < 0 || index > _.slideCount - _.options.slidesToScroll)
+		) {
+			if (_.options.fade === false) {
+				targetSlide = _.currentSlide;
+				if (dontAnimate !== true && _.slideCount > _.options.slidesToShow) {
+					_.animateSlide(slideLeft, function () {
+						_.postSlide(targetSlide);
+					});
+				} else {
+					_.postSlide(targetSlide);
+				}
+			}
+			return;
+		}
+		if (_.options.autoplay) {
+			clearInterval(_.autoPlayTimer);
+		}
+		if (targetSlide < 0) {
+			if (_.slideCount % _.options.slidesToScroll !== 0) {
+				animSlide = _.slideCount - (_.slideCount % _.options.slidesToScroll);
+			} else {
+				animSlide = _.slideCount + targetSlide;
+			}
+		} else if (targetSlide >= _.slideCount) {
+			if (_.slideCount % _.options.slidesToScroll !== 0) {
+				animSlide = 0;
+			} else {
+				animSlide = targetSlide - _.slideCount;
+			}
+		} else {
+			animSlide = targetSlide;
+		}
+		_.animating = true;
+		_.$slider.trigger('beforeChange', [_, _.currentSlide, animSlide]);
+		oldSlide = _.currentSlide;
+		_.currentSlide = animSlide;
+		_.setSlideClasses(_.currentSlide);
+		if (_.options.asNavFor) {
+			navTarget = _.getNavTarget();
+			navTarget = navTarget.slick('getSlick');
+			if (navTarget.slideCount <= navTarget.options.slidesToShow) {
+				navTarget.setSlideClasses(_.currentSlide);
+			}
+		}
+		_.updateDots();
+		_.updateArrows();
+		if (_.options.fade === true) {
+			if (dontAnimate !== true) {
+				_.fadeSlideOut(oldSlide);
+				_.fadeSlide(animSlide, function () {
+					_.postSlide(animSlide);
+				});
+			} else {
+				_.postSlide(animSlide);
+			}
+			_.animateHeight();
+			return;
+		}
+		if (dontAnimate !== true && _.slideCount > _.options.slidesToShow) {
+			_.animateSlide(targetLeft, function () {
+				_.postSlide(animSlide);
+			});
+		} else {
+			_.postSlide(animSlide);
+		}
+	};
+	Slick.prototype.startLoad = function () {
+		var _ = this;
+		if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+			_.$prevArrow.hide();
+			_.$nextArrow.hide();
+		}
+		if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+			_.$dots.hide();
+		}
+		_.$slider.addClass('slick-loading');
+	};
+	Slick.prototype.swipeDirection = function () {
+		var xDist,
+			yDist,
+			r,
+			swipeAngle,
+			_ = this;
+		xDist = _.touchObject.startX - _.touchObject.curX;
+		yDist = _.touchObject.startY - _.touchObject.curY;
+		r = Math.atan2(yDist, xDist);
+		swipeAngle = Math.round((r * 180) / Math.PI);
+		if (swipeAngle < 0) {
+			swipeAngle = 360 - Math.abs(swipeAngle);
+		}
+		if (swipeAngle <= 45 && swipeAngle >= 0) {
+			return _.options.rtl === false ? 'left' : 'right';
+		}
+		if (swipeAngle <= 360 && swipeAngle >= 315) {
+			return _.options.rtl === false ? 'left' : 'right';
+		}
+		if (swipeAngle >= 135 && swipeAngle <= 225) {
+			return _.options.rtl === false ? 'right' : 'left';
+		}
+		if (_.options.verticalSwiping === true) {
+			if (swipeAngle >= 35 && swipeAngle <= 135) {
+				return 'down';
+			} else {
+				return 'up';
+			}
+		}
+		return 'vertical';
+	};
+	Slick.prototype.swipeEnd = function (event) {
+		var _ = this,
+			slideCount,
+			direction;
+		_.dragging = false;
+		_.swiping = false;
+		if (_.scrolling) {
+			_.scrolling = false;
+			return false;
+		}
+		_.interrupted = false;
+		_.shouldClick = _.touchObject.swipeLength > 10 ? false : true;
+		if (_.touchObject.curX === undefined) {
+			return false;
+		}
+		if (_.touchObject.edgeHit === true) {
+			_.$slider.trigger('edge', [_, _.swipeDirection()]);
+		}
+		if (_.touchObject.swipeLength >= _.touchObject.minSwipe) {
+			direction = _.swipeDirection();
+			switch (direction) {
+				case 'left':
+				case 'down':
+					slideCount = _.options.swipeToSlide
+						? _.checkNavigable(_.currentSlide + _.getSlideCount())
+						: _.currentSlide + _.getSlideCount();
+					_.currentDirection = 0;
+					break;
+				case 'right':
+				case 'up':
+					slideCount = _.options.swipeToSlide
+						? _.checkNavigable(_.currentSlide - _.getSlideCount())
+						: _.currentSlide - _.getSlideCount();
+					_.currentDirection = 1;
+					break;
+				default:
+			}
+			if (direction != 'vertical') {
+				_.slideHandler(slideCount);
+				_.touchObject = {};
+				_.$slider.trigger('swipe', [_, direction]);
+			}
+		} else {
+			if (_.touchObject.startX !== _.touchObject.curX) {
+				_.slideHandler(_.currentSlide);
+				_.touchObject = {};
+			}
+		}
+	};
+	Slick.prototype.swipeHandler = function (event) {
+		var _ = this;
+		if (
+			_.options.swipe === false ||
+			('ontouchend' in document && _.options.swipe === false)
+		) {
+			return;
+		} else if (
+			_.options.draggable === false &&
+			event.type.indexOf('mouse') !== -1
+		) {
+			return;
+		}
+		_.touchObject.fingerCount =
+			event.originalEvent && event.originalEvent.touches !== undefined
+				? event.originalEvent.touches.length
+				: 1;
+		_.touchObject.minSwipe = _.listWidth / _.options.touchThreshold;
+		if (_.options.verticalSwiping === true) {
+			_.touchObject.minSwipe = _.listHeight / _.options.touchThreshold;
+		}
+		switch (event.data.action) {
+			case 'start':
+				_.swipeStart(event);
+				break;
+			case 'move':
+				_.swipeMove(event);
+				break;
+			case 'end':
+				_.swipeEnd(event);
+				break;
+		}
+	};
+	Slick.prototype.swipeMove = function (event) {
+		var _ = this,
+			edgeWasHit = false,
+			curLeft,
+			swipeDirection,
+			swipeLength,
+			positionOffset,
+			touches,
+			verticalSwipeLength;
+		touches =
+			event.originalEvent !== undefined ? event.originalEvent.touches : null;
+		if (!_.dragging || _.scrolling || (touches && touches.length !== 1)) {
+			return false;
+		}
+		curLeft = _.getLeft(_.currentSlide);
+		_.touchObject.curX = touches !== undefined ? touches[0].pageX : event.clientX;
+		_.touchObject.curY = touches !== undefined ? touches[0].pageY : event.clientY;
+		_.touchObject.swipeLength = Math.round(
+			Math.sqrt(Math.pow(_.touchObject.curX - _.touchObject.startX, 2))
+		);
+		verticalSwipeLength = Math.round(
+			Math.sqrt(Math.pow(_.touchObject.curY - _.touchObject.startY, 2))
+		);
+		if (!_.options.verticalSwiping && !_.swiping && verticalSwipeLength > 4) {
+			_.scrolling = true;
+			return false;
+		}
+		if (_.options.verticalSwiping === true) {
+			_.touchObject.swipeLength = verticalSwipeLength;
+		}
+		swipeDirection = _.swipeDirection();
+		if (event.originalEvent !== undefined && _.touchObject.swipeLength > 4) {
+			_.swiping = true;
+			event.preventDefault();
+		}
+		positionOffset =
+			(_.options.rtl === false ? 1 : -1) *
+			(_.touchObject.curX > _.touchObject.startX ? 1 : -1);
+		if (_.options.verticalSwiping === true) {
+			positionOffset = _.touchObject.curY > _.touchObject.startY ? 1 : -1;
+		}
+		swipeLength = _.touchObject.swipeLength;
+		_.touchObject.edgeHit = false;
+		if (_.options.infinite === false) {
+			if (
+				(_.currentSlide === 0 && swipeDirection === 'right') ||
+				(_.currentSlide >= _.getDotCount() && swipeDirection === 'left')
+			) {
+				swipeLength = _.touchObject.swipeLength * _.options.edgeFriction;
+				_.touchObject.edgeHit = true;
+			}
+		}
+		if (_.options.vertical === false) {
+			_.swipeLeft = curLeft + swipeLength * positionOffset;
+		} else {
+			_.swipeLeft =
+				curLeft + swipeLength * (_.$list.height() / _.listWidth) * positionOffset;
+		}
+		if (_.options.verticalSwiping === true) {
+			_.swipeLeft = curLeft + swipeLength * positionOffset;
+		}
+		if (_.options.fade === true || _.options.touchMove === false) {
+			return false;
+		}
+		if (_.animating === true) {
+			_.swipeLeft = null;
+			return false;
+		}
+		_.setCSS(_.swipeLeft);
+	};
+	Slick.prototype.swipeStart = function (event) {
+		var _ = this,
+			touches;
+		_.interrupted = true;
+		if (
+			_.touchObject.fingerCount !== 1 ||
+			_.slideCount <= _.options.slidesToShow
+		) {
+			_.touchObject = {};
+			return false;
+		}
+		if (
+			event.originalEvent !== undefined &&
+			event.originalEvent.touches !== undefined
+		) {
+			touches = event.originalEvent.touches[0];
+		}
+		_.touchObject.startX = _.touchObject.curX =
+			touches !== undefined ? touches.pageX : event.clientX;
+		_.touchObject.startY = _.touchObject.curY =
+			touches !== undefined ? touches.pageY : event.clientY;
+		_.dragging = true;
+	};
+	Slick.prototype.unfilterSlides = Slick.prototype.slickUnfilter = function () {
+		var _ = this;
+		if (_.$slidesCache !== null) {
+			_.unload();
+			_.$slideTrack.children(this.options.slide).detach();
+			_.$slidesCache.appendTo(_.$slideTrack);
+			_.reinit();
+		}
+	};
+	Slick.prototype.unload = function () {
+		var _ = this;
+		$('.slick-cloned', _.$slider).remove();
+		if (_.$dots) {
+			_.$dots.remove();
+		}
+		if (_.$prevArrow && _.htmlExpr.test(_.options.prevArrow)) {
+			_.$prevArrow.remove();
+		}
+		if (_.$nextArrow && _.htmlExpr.test(_.options.nextArrow)) {
+			_.$nextArrow.remove();
+		}
+		_.$slides
+			.removeClass('slick-slide slick-active slick-visible slick-current')
+			.attr('aria-hidden', 'true')
+			.css('width', '');
+	};
+	Slick.prototype.unslick = function (fromBreakpoint) {
+		var _ = this;
+		_.$slider.trigger('unslick', [_, fromBreakpoint]);
+		_.destroy();
+	};
+	Slick.prototype.updateArrows = function () {
+		var _ = this,
+			centerOffset;
+		centerOffset = Math.floor(_.options.slidesToShow / 2);
+		if (
+			_.options.arrows === true &&
+			_.slideCount > _.options.slidesToShow &&
+			!_.options.infinite
+		) {
+			_.$prevArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+			_.$nextArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+			if (_.currentSlide === 0) {
+				_.$prevArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+				_.$nextArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+			} else if (
+				_.currentSlide >= _.slideCount - _.options.slidesToShow &&
+				_.options.centerMode === false
+			) {
+				_.$nextArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+				_.$prevArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+			} else if (
+				_.currentSlide >= _.slideCount - 1 &&
+				_.options.centerMode === true
+			) {
+				_.$nextArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+				_.$prevArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+			}
+		}
+	};
+	Slick.prototype.updateDots = function () {
+		var _ = this;
+		if (_.$dots !== null) {
+			_.$dots.find('li').removeClass('slick-active').end();
+			_.$dots
+				.find('li')
+				.eq(Math.floor(_.currentSlide / _.options.slidesToScroll))
+				.addClass('slick-active');
+		}
+	};
+	Slick.prototype.visibility = function () {
+		var _ = this;
+		if (_.options.autoplay) {
+			if (document[_.hidden]) {
+				_.interrupted = true;
+			} else {
+				_.interrupted = false;
+			}
+		}
+	};
+	$.fn.slick = function () {
+		var _ = this,
+			opt = arguments[0],
+			args = Array.prototype.slice.call(arguments, 1),
+			l = _.length,
+			i,
+			ret;
+		for (i = 0; i < l; i++) {
+			if (typeof opt == 'object' || typeof opt == 'undefined')
+				_[i].slick = new Slick(_[i], opt);
+			else ret = _[i].slick[opt].apply(_[i].slick, args);
+			if (typeof ret != 'undefined') return ret;
+		}
+		return _;
+	};
+});
