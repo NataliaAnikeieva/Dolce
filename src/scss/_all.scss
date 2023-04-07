@@ -103,6 +103,54 @@ html,body {
 	background-color: $color2;
 	padding: 25px 40px 80px 25px;
 }
+// slider
+.slider {
+	&__holder {
+		position: relative;
+	}
+	&__content {
+		display: inline-flex;
+		flex-direction: column;
+		padding: 130px 0 0 60px;
+		&--title {
+			padding: 10px;
+			background-color: $bgc1;
+		}
+		&--text {
+			width: 320px;
+			font-size: 30px;
+			color: $color1;
+			background-color: $bgc1;
+			padding: 10px;
+			text-transform: uppercase;
+			font-family: $secondary-font;
+		}
+	}
+	&__item {
+		height: 350px;
+	}
+	&__controls {
+		position: absolute;
+		top: 0;
+		left: 62%;
+	}
+	&__control {
+		background-color: $bgc1;
+		padding: 10px;
+		@include transition(background);
+		&:hover {
+			background-color: $color2;
+			color: $color7;
+		}
+	}
+} 
+.control__content--title {
+	color: $color2;
+	@include transition(background);
+	&:hover {
+		color: $color7;
+	}
+}
 // aside-1
 .aside {
 	display: flex;

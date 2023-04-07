@@ -6,6 +6,11 @@ body {
     font-weight: 400;
     color: $color1;
 }
+h1 {
+	font-size: $fs-xxlg;
+	font-family: $secondary-font;
+	color: $color2;
+}
 h2 {
 	font-family: "_officina_sans";
 	text-transform: uppercase;

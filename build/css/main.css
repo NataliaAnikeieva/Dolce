@@ -6,6 +6,12 @@ body {
     color: #b2b2b2;
 }
 
+h1 {
+    font-size: 90px;
+    font-family: "roadwayregular";
+    color: #fff;
+}
+
 h2 {
     font-family: "_officina_sans";
     text-transform: uppercase;
@@ -211,6 +217,62 @@ html, body {
     text-align: center;
     background-color: #fff;
     padding: 25px 40px 80px 25px;
+}
+
+.slider__holder {
+    position: relative;
+}
+.slider__content {
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    padding: 130px 0 0 60px;
+}
+.slider__content--title {
+    padding: 10px;
+    background-color: rgba(31, 31, 31, 0.9);
+}
+.slider__content--text {
+    width: 320px;
+    font-size: 30px;
+    color: #b2b2b2;
+    background-color: rgba(31, 31, 31, 0.9);
+    padding: 10px;
+    text-transform: uppercase;
+    font-family: "roadwayregular";
+}
+.slider__item {
+    height: 350px;
+}
+.slider__controls {
+    position: absolute;
+    top: 0;
+    left: 62%;
+}
+.slider__control {
+    background-color: rgba(31, 31, 31, 0.9);
+    padding: 10px;
+    -webkit-transition: background 0.5s ease 0s;
+    -o-transition: background 0.5s ease 0s;
+    transition: background 0.5s ease 0s;
+}
+.slider__control:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.control__content--title {
+    color: #fff;
+    -webkit-transition: background 0.5s ease 0s;
+    -o-transition: background 0.5s ease 0s;
+    transition: background 0.5s ease 0s;
+}
+.control__content--title:hover {
+    color: #000;
 }
 
 .aside {
@@ -1225,6 +1287,12 @@ body {
     font-size: 12px;
     font-weight: 400;
     color: #b2b2b2;
+}
+
+h1 {
+    font-size: 90px;
+    font-family: "roadwayregular";
+    color: #fff;
 }
 
 h2 {
