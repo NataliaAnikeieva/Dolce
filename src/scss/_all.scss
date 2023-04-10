@@ -111,7 +111,7 @@ html,body {
 	&__content {
 		display: inline-flex;
 		flex-direction: column;
-		padding: 130px 0 0 60px;
+		padding: 130px 0 0 20px;
 		&--title {
 			padding: 10px;
 			background-color: $bgc1;
@@ -136,19 +136,20 @@ html,body {
 	}
 	&__control {
 		background-color: $bgc1;
-		padding: 10px;
+		padding: 11px;
 		@include transition(background);
 		&:hover {
 			background-color: $color2;
 			color: $color7;
+			&::before {
+				
+			}
 		}
 	}
 } 
-.control__content--title {
-	color: $color2;
-	@include transition(background);
-	&:hover {
-		color: $color7;
+.slider__controls {
+	.slick-slide{
+		border: none;
 	}
 }
 // aside-1
