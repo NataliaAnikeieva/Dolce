@@ -16,12 +16,7 @@ h1 {
 h2 {
     font-family: "_officina_sans";
     text-transform: uppercase;
-    -webkit-transition: color 0.5s ease 0s;
-    -o-transition: color 0.5s ease 0s;
-    transition: color 0.5s ease 0s;
-}
-h2:hover {
-    opacity: 0.8;
+    color: #fff;
 }
 
 h3 {
@@ -79,7 +74,8 @@ html, body {
     height: 100%;
     font-size: 12px;
     font-family: "Arial";
-    background: url(../img/background.jpg);
+    -webkit-font-smoothing: antialiased;
+    background-color: #000;
 }
 
 .wrapper {
@@ -91,6 +87,8 @@ html, body {
     -webkit-box-direction: normal;
         -ms-flex-direction: column;
             flex-direction: column;
+    background: url(../img/background.jpg);
+    background-attachment: fixed;
 }
 
 .content {
@@ -102,10 +100,11 @@ html, body {
 [class*=__container] {
     max-width: 1020px;
     margin: 0 auto;
+    padding: 0 15px;
 }
 
 .header__container {
-    padding: 23px 0;
+    padding: 23px 0 0;
 }
 
 .header__top--list {
@@ -196,9 +195,9 @@ html, body {
 .social__link {
     font-size: 14px;
     font-family: "roadwayregular";
-    -webkit-transition: color 0.5s ease 0s;
-    -o-transition: color 0.5s ease 0s;
-    transition: color 0.5s ease 0s;
+    -webkit-transition: opacity 0.5s ease 0s;
+    -o-transition: opacity 0.5s ease 0s;
+    transition: opacity 0.5s ease 0s;
 }
 .social__link:hover {
     opacity: 0.8;
@@ -220,56 +219,60 @@ html, body {
     padding: 25px 40px 80px 25px;
 }
 
-.slider__holder {
-    position: relative;
-}
-.slider__content {
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
-    display: inline-flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-    padding: 130px 0 0 20px;
-}
-.slider__content--title {
-    padding: 10px;
-    background-color: rgba(31, 31, 31, 0.9);
-}
-.slider__content--text {
-    width: 320px;
-    font-size: 30px;
-    color: #b2b2b2;
-    background-color: rgba(31, 31, 31, 0.9);
-    padding: 10px;
-    text-transform: uppercase;
-    font-family: "roadwayregular";
-}
 .slider__item {
-    height: 350px;
+    height: 340px;
 }
 .slider__controls {
-    position: absolute;
-    top: 0;
-    left: 62%;
-}
-.slider__control {
-    background-color: rgba(31, 31, 31, 0.9);
-    padding: 11px;
-    -webkit-transition: background 0.5s ease 0s;
-    -o-transition: background 0.5s ease 0s;
-    transition: background 0.5s ease 0s;
-}
-.slider__control:hover {
-    background-color: #fff;
-    color: #000;
+    margin-top: -38%;
+    margin-left: 70%;
 }
 .slider__controls .slick-slide {
     border: none;
 }
+.slider__control {
+    background-color: rgba(31, 31, 31, 0.9);
+    padding: 10px;
+    width: 280px;
+    display: inline-block;
+    margin-left: 20px;
+}
+.slider__control:hover {
+    background-color: #fff;
+}
+.slider__control:hover::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 7.5px 15px 7.5px 0;
+    border-color: transparent #f6f7f9 transparent transparent;
+    left: 2%;
+    margin-top: 8px;
+}
+
+.slider__content {
+    margin-top: 15%;
+    margin-left: 5%;
+}
+.slider__content--title {
+    width: 580px;
+    background-color: rgba(31, 31, 31, 0.9);
+    padding: 5px;
+    overflow: hidden;
+}
+.slider__content--text {
+    width: 320px;
+    font-family: "roadwayregular";
+    background-color: rgba(31, 31, 31, 0.9);
+    text-transform: uppercase;
+    padding: 5px;
+    font-size: 30px;
+}
 
 .aside {
+    width: 23%;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -282,24 +285,28 @@ html, body {
     padding: 15px 15px;
 }
 
-.aside-1__img {
+.left__img {
     width: 160px;
     height: 125px;
 }
-.aside-1__subtitle {
+.left__subtitle {
     margin: 20px 0;
     color: #649671;
 }
-.aside-1__text {
-    width: 150px;
+.left__text {
     border-bottom: 1px solid #b2b2b2;
     padding-bottom: 15px;
     margin-bottom: 15px;
 }
-.aside-1__link {
+.left__list {
+    margin-bottom: 40px;
+    border-bottom: 2px solid #649671;
+    padding-bottom: 25px;
+}
+.left__link {
     color: #649671;
 }
-.aside-1__link:hover {
+.left__link:hover {
     text-decoration: underline;
 }
 
@@ -330,6 +337,14 @@ html, body {
     background-color: rgba(31, 31, 31, 0.9);
     top: -30px;
 }
+.center__link {
+    -webkit-transition: opacity 0.5s ease 0s;
+    -o-transition: opacity 0.5s ease 0s;
+    transition: opacity 0.5s ease 0s;
+}
+.center__link:hover {
+    opacity: 0.8;
+}
 
 .green {
     display: -webkit-box;
@@ -343,7 +358,11 @@ html, body {
 }
 .green__title {
     padding: 5px 10px;
-    background-color: #94bc9e;
+    background: #9cc3a4;
+    background: -webkit-gradient(linear, left top, right top, from(#9cc3a4), color-stop(35%, #95bc9d), color-stop(40%, #92b99a), color-stop(75%, #89b091), to(#7da988));
+    background: -o-linear-gradient(left, #9cc3a4 0%, #95bc9d 35%, #92b99a 40%, #89b091 75%, #7da988 100%);
+    background: linear-gradient(to right, #9cc3a4 0%, #95bc9d 35%, #92b99a 40%, #89b091 75%, #7da988 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#9cc3a4", endColorstr="#7da988",GradientType=1 );
     margin: 14px 0 30px;
 }
 .green__link {
@@ -356,7 +375,7 @@ html, body {
     text-decoration: underline;
 }
 
-.aside-2 {
+.aside-right {
     background-color: #fff;
 }
 
@@ -520,6 +539,32 @@ html, body {
     .nav__link {
         font-size: 16px;
     }
+    .main__content {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+    }
+    .center {
+        -webkit-box-ordinal-group: 2;
+            -ms-flex-order: 1;
+                order: 1;
+        width: 100%;
+    }
+    .left {
+        -webkit-box-ordinal-group: 4;
+            -ms-flex-order: 3;
+                order: 3;
+        width: 100%;
+    }
+    .aside-right {
+        -webkit-box-ordinal-group: 3;
+            -ms-flex-order: 2;
+                order: 2;
+        width: 100%;
+    }
     .footer__top {
         -webkit-box-orient: vertical;
         -webkit-box-direction: normal;
@@ -528,6 +573,29 @@ html, body {
     }
     .footer__logo {
         margin-bottom: 20px;
+        -webkit-box-ordinal-group: 2;
+            -ms-flex-order: 1;
+                order: 1;
+    }
+    .footer__menu {
+        -webkit-box-ordinal-group: 6;
+            -ms-flex-order: 5;
+                order: 5;
+    }
+    .buttom__footer--text {
+        -webkit-box-ordinal-group: 3;
+            -ms-flex-order: 2;
+                order: 2;
+    }
+    .buttom__footer--about {
+        -webkit-box-ordinal-group: 4;
+            -ms-flex-order: 3;
+                order: 3;
+    }
+    .buttom__footer--subscribe {
+        -webkit-box-ordinal-group: 5;
+            -ms-flex-order: 4;
+                order: 4;
     }
     .buttom__footer {
         -webkit-box-orient: vertical;
@@ -1187,6 +1255,26 @@ ul {
     border-left: 1px solid #b2b2b2;
 }
 
+input:focus::-webkit-input-placeholder {
+    color: transparent;
+}
+
+input:focus::-moz-placeholder {
+    color: transparent;
+}
+
+input:focus:-ms-input-placeholder {
+    color: transparent;
+}
+
+input:focus::-ms-input-placeholder {
+    color: transparent;
+}
+
+input:focus::placeholder {
+    color: transparent;
+}
+
 .search {
     border: none;
     background-color: transparent;
@@ -1194,7 +1282,11 @@ ul {
 
 .aside__btn {
     width: 160px;
-    background-color: #94bc9e;
+    background: #9cc3a4;
+    background: -webkit-gradient(linear, left top, right top, from(#9cc3a4), color-stop(35%, #95bc9d), color-stop(40%, #92b99a), color-stop(75%, #89b091), to(#7da988));
+    background: -o-linear-gradient(left, #9cc3a4 0%, #95bc9d 35%, #92b99a 40%, #89b091 75%, #7da988 100%);
+    background: linear-gradient(to right, #9cc3a4 0%, #95bc9d 35%, #92b99a 40%, #89b091 75%, #7da988 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#9cc3a4", endColorstr="#7da988",GradientType=1 );
     color: #649671;
     text-transform: uppercase;
     font-family: "roadwayregular";
@@ -1293,12 +1385,7 @@ h1 {
 h2 {
     font-family: "_officina_sans";
     text-transform: uppercase;
-    -webkit-transition: color 0.5s ease 0s;
-    -o-transition: color 0.5s ease 0s;
-    transition: color 0.5s ease 0s;
-}
-h2:hover {
-    opacity: 0.8;
+    color: #fff;
 }
 
 h3 {

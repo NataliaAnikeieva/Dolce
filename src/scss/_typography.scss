@@ -15,10 +15,7 @@ h1 {
 h2 {
 	font-family: "_officina_sans";
 	text-transform: uppercase;
-	@include transition(color);
-	&:hover {
-		opacity: .8;
-	}
+	color: $color2;
 }
 h3 {
 	font-family: $third-font;
