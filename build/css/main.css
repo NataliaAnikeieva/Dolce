@@ -17,6 +17,7 @@ h2 {
     font-family: "_officina_sans";
     text-transform: uppercase;
     color: #fff;
+    line-height: 1;
 }
 
 h3 {
@@ -70,15 +71,27 @@ a {
     font-weight: normal;
     font-style: normal;
 }
+.subscrube__input::after, .header__top--input::after {
+    display: inline-block;
+    font: 14px/1 font-awesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 html, body {
     height: 100%;
     font-size: 12px;
     font-family: "Arial";
     -webkit-font-smoothing: antialiased;
+}
+
+body {
     background-color: #000;
 }
 
 .wrapper {
+    position: relative;
     min-height: 100%;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -90,17 +103,27 @@ html, body {
     background: url(../img/background.jpg);
     background-attachment: fixed;
 }
+.wrapper::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 340px;
+    width: 100%;
+    background-color: #010101;
+}
 
 .content {
     -webkit-box-flex: 1;
         -ms-flex: 1 1 auto;
             flex: 1 1 auto;
+    position: relative;
+    z-index: 1;
 }
 
 [class*=__container] {
     max-width: 1020px;
     margin: 0 auto;
-    padding: 0 15px;
 }
 
 .header__container {
@@ -156,13 +179,16 @@ html, body {
         -ms-flex-align: center;
             align-items: center;
     background-color: #000;
-    padding: 0 10px;
+    padding: 5px 10px;
     margin-top: 25px;
 }
 
 .logo__link {
     font-size: 36px;
     text-transform: uppercase;
+}
+.logo__link:hover {
+    opacity: 0.8;
 }
 
 .nav__list {
@@ -203,10 +229,6 @@ html, body {
     opacity: 0.8;
 }
 
-.main__container {
-    padding: 0;
-}
-
 .main__content {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -236,11 +258,9 @@ html, body {
     display: inline-block;
     margin-left: 20px;
 }
-.slider__control:hover {
-    background-color: #fff;
-}
-.slider__control:hover::before {
+.slider__control::before {
     content: "";
+    opacity: 0;
     position: absolute;
     display: inline-block;
     width: 0;
@@ -250,6 +270,20 @@ html, body {
     border-color: transparent #f6f7f9 transparent transparent;
     left: 2%;
     margin-top: 8px;
+}
+.slider__control:hover {
+    background-color: #fff;
+}
+.slider__control:hover::before {
+    opacity: 1;
+}
+
+li.slider__control:hover h2 {
+    color: #000;
+}
+
+li.slider__control:hover p {
+    color: #000;
 }
 
 .slider__content {
@@ -328,22 +362,59 @@ html, body {
     width: 49.5%;
     padding-top: 20px;
 }
-.center__bigimg {
-    max-width: 100%;
-}
-.center__subtitle {
-    position: relative;
-    padding: 5px;
-    background-color: rgba(31, 31, 31, 0.9);
-    top: -30px;
+.center__img--big {
+    height: 296px;
 }
 .center__link {
-    -webkit-transition: opacity 0.5s ease 0s;
-    -o-transition: opacity 0.5s ease 0s;
-    transition: opacity 0.5s ease 0s;
+    position: relative;
+    display: block;
+    height: 100%;
 }
 .center__link:hover {
     opacity: 0.8;
+}
+.center__link--bigimg {
+    height: 296px;
+    width: 100%;
+}
+.center__img--small {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.center__subtitle {
+    position: absolute;
+    width: 100%;
+    padding: 5px;
+    background-color: rgba(31, 31, 31, 0.9);
+    bottom: 0;
+}
+
+.discount {
+    position: absolute;
+    top: 40%;
+    left: 66%;
+}
+.discount__text {
+    color: #fff;
+    font-size: 46px;
+    font-family: "_officina_sans";
+    position: absolute;
+    top: 50%;
+    left: 75%;
+}
+.discount__interest {
+    color: #fff;
+    font-size: 22px;
+    font-family: "_officina_sans";
+    position: absolute;
+    top: 66%;
+    left: 79%;
 }
 
 .green {
@@ -434,6 +505,10 @@ html, body {
     text-decoration: underline;
 }
 
+.footer {
+    position: relative;
+    z-index: 1;
+}
 .footer__container {
     padding: 50px;
     background-color: rgba(31, 31, 31, 0.9);
@@ -532,12 +607,15 @@ html, body {
     opacity: 0.8;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1000px) {
     .logo__link {
         font-size: 30px;
     }
     .nav__link {
         font-size: 16px;
+    }
+    .slider__holder {
+        display: none;
     }
     .main__content {
         -webkit-box-orient: vertical;
@@ -546,12 +624,14 @@ html, body {
                 flex-direction: column;
         -ms-flex-wrap: wrap;
             flex-wrap: wrap;
+        width: 540px;
+        margin: 0 auto;
     }
     .center {
+        width: 100%;
         -webkit-box-ordinal-group: 2;
             -ms-flex-order: 1;
                 order: 1;
-        width: 100%;
     }
     .left {
         -webkit-box-ordinal-group: 4;
@@ -573,29 +653,6 @@ html, body {
     }
     .footer__logo {
         margin-bottom: 20px;
-        -webkit-box-ordinal-group: 2;
-            -ms-flex-order: 1;
-                order: 1;
-    }
-    .footer__menu {
-        -webkit-box-ordinal-group: 6;
-            -ms-flex-order: 5;
-                order: 5;
-    }
-    .buttom__footer--text {
-        -webkit-box-ordinal-group: 3;
-            -ms-flex-order: 2;
-                order: 2;
-    }
-    .buttom__footer--about {
-        -webkit-box-ordinal-group: 4;
-            -ms-flex-order: 3;
-                order: 3;
-    }
-    .buttom__footer--subscribe {
-        -webkit-box-ordinal-group: 5;
-            -ms-flex-order: 4;
-                order: 4;
     }
     .buttom__footer {
         -webkit-box-orient: vertical;
@@ -703,6 +760,11 @@ html, body {
     }
     .header__social {
         display: none;
+    }
+}
+@media (max-width: 570px) {
+    .main__content {
+        width: 80%;
     }
 }
 /*NORMALIZE.CSS*/
@@ -1238,7 +1300,7 @@ ul {
     background-color: #fff;
 }
 .header__top--input::after {
-    content: "\f002";
+    content: "\f0e0";
 }
 
 .subscrube__input {
@@ -1250,7 +1312,7 @@ ul {
     border: 1px solid #b2b2b2;
 }
 .subscrube__input::after {
-    content: "\f0e0";
+    content: "\f019";
     padding-left: 3px;
     border-left: 1px solid #b2b2b2;
 }
@@ -1304,7 +1366,7 @@ input:focus::placeholder {
     background-color: #649671;
 }
 
-.aside-1__btn::after {
+.aside-left__btn::after {
     display: inline-block;
     content: "\f061";
     margin-left: 10px;
@@ -1317,6 +1379,7 @@ input:focus::placeholder {
 }
 
 .radio + label {
+    position: relative;
     display: -webkit-inline-box;
     display: -ms-inline-flexbox;
     display: inline-flex;
@@ -1349,12 +1412,24 @@ input:focus::placeholder {
 
 .radio:checked + label::before {
     border-color: #b1b1b1;
-    background-color: #000;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
 }
 
 .radio:disabled + label::before {
     background-color: #e9ecef;
+}
+
+.radio + label::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: transparent;
+    border-radius: 50%;
+    position: absolute;
+    left: 3.3px;
+}
+
+.radio:checked + label::after {
+    background: rgb(94, 92, 92);
 }
 
 .radioP:not(:last-child) {
@@ -1386,6 +1461,7 @@ h2 {
     font-family: "_officina_sans";
     text-transform: uppercase;
     color: #fff;
+    line-height: 1;
 }
 
 h3 {
@@ -1438,5 +1514,12 @@ a {
     src: url("../fonts/itc-officina-sans-std-book-font-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/itc-officina-sans-std-book-font-webfont.woff2") format("woff2"), url("../fonts/itc-officina-sans-std-book-font-webfont.woff") format("woff"), url("../fonts/itc-officina-sans-std-book-font-webfont.ttf") format("truetype"), url("../fonts/itc-officina-sans-std-book-font-webfont.svg#itc_officina_sans_stdbook") format("svg");
     font-weight: normal;
     font-style: normal;
+}
+.header__top--input::after, .subscrube__input::after {
+    display: inline-block;
+    font: 14px/1 font-awesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 /*# sourceMappingURL=maps/main.css.map */

@@ -31,3 +31,11 @@
     font-weight: normal;
     font-style: normal;
 }
+// placeholder will be used instead if @extend .icon to avoid creation of extra styles
+%font-awesome {
+    display: inline-block;
+    font: 14px/1 font-awesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

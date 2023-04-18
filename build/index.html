@@ -12,13 +12,14 @@
     <!-- FAVICON-->
     <link href="favicon.ico" rel="shortcut icon">
     <!-- CSS LINKS-->
+    <link href="css/iconsfonts.css" rel="stylesheet" media="screen">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet" media="screen">
     <link href="css/widgets.css" rel="stylesheet" media="screen">
     <link href="css/main.css" rel="stylesheet" media="screen">
     <title>Dolce</title>
   </head>
   <body>
-    <wrapper class="wrapper"> 
+    <div class="wrapper"> 
       <header class="header">
         <div class="header__container"> 
           <div class="header__top">
@@ -185,7 +186,7 @@
           </div>
           <div class="main__content">
             <aside class="aside left">
-              <h3 class="center__title">The latest</h3>
+              <h3 class="title__center">The latest</h3>
               <ul class="left__list"> 
                 <li class="left__item"><img src="img/wings.jpg" alt=""></li>
                 <li class="left__item">
@@ -219,32 +220,32 @@
                 <li class="left__item">by <a class="left__link" href="#">Sergio La Puerta</a></li>
                 <li class="left__item">on Jun 4, 2011 <a class="left__link" href="#">24 comments </a></li>
               </ul>
-              <button class="aside__btn aside-1__btn">more offers</button>
+              <button class="aside__btn aside-left__btn">more offers</button>
             </aside>
             <article class="center"> 
-              <h3 class="center__title">Best offers </h3>
-              <div class="center__bigimg"><a class="center__link" href="#"> <img src="img/biggirl.jpg" alt="">
-                  <h5 class="center__subtitle">discounted rachel comey’s</h5></a></div>
-              <div class="center__small-img small"> 
-                <div class="small__img"><a class="center__link" href="#"> <img src="img/small.jpg" alt="">
-                    <h5 class="center__subtitle">freja beha</h5></a></div>
-                <div class="small__img"><a class="center__link" href="#"> <img src="img/lacosta.jpg" alt="">
-                    <h5 class="center__subtitle">discounted Lacoste discount: 50%</h5></a></div>
-              </div>
-              <div class="center__bigimg"><a class="center__link" href="#"> <img src="img/twogirls.jpg" alt="">
-                  <h5 class="center__subtitle">discounted rachel comey’s</h5></a></div>
-              <div class="center__small-img small"> 
-                <div class="small__img"><a class="center__link" href="#"> <img src="img/small.jpg" alt="">
-                    <h5 class="center__subtitle">freja beha</h5></a></div>
-                <div class="small__img"><a class="center__link" href="#"> <img src="img/lacosta.jpg" alt=""></a>
-                  <h5 class="center__subtitle">discounted Lacoste discount: 50%</h5>
+              <h3 class="title__center">Best offers
+                <div class="center__img">
+                  <div class="center__img--big"> <a class="center__link" href="#"> <img class="center__link--bigimg" src="img/biggirl.jpg" alt=""><img class="discount" src="img/discount.png" alt="">
+                      <p class="discount__text">25</p>
+                      <p class="discount__interest">%</p>
+                      <h5 class="center__subtitle">discounted rachel comey’s</h5></a></div>
+                  <div class="center__img--small"><a class="center__link" href="#"> <img src="img/lacosta.jpg" alt="">
+                      <h5 class="center__subtitle">discounted Lacoste discount: 50%</h5></a><a class="center__link" href="#"> <img src="img/lacosta.jpg" alt="">
+                      <h5 class="center__subtitle">discounted Lacoste discount: 50%</h5></a></div>
+                  <div class="center__img--big"> <a class="center__link" href="#"> <img class="center__link--bigimg" src="img/biggirl.jpg" alt=""><img class="discount" src="img/discount.png" alt="">
+                      <p class="discount__text">25</p>
+                      <p class="discount__interest">%</p>
+                      <h5 class="center__subtitle">discounted rachel comey’s</h5></a></div>
+                  <div class="center__img--small"><a class="center__link" href="#"> <img src="img/lacosta.jpg" alt="">
+                      <h5 class="center__subtitle">discounted Lacoste discount: 50%</h5></a><a class="center__link" href="#"> <img src="img/lacosta.jpg" alt="">
+                      <h5 class="center__subtitle">discounted Lacoste discount: 50%</h5></a></div>
                 </div>
-              </div>
+              </h3>
               <div class="center__green green"> 
                 <h6 class="green__title">Interesting article</h6>
-                <div class="green__text">Designer Edmar Cisneros has an interesting and unique philosophy regarding design that. It’s always entertaining to explore the works of a great caricature artist. This showcase from Web Designer Depot features some amazing and hilarious caricatures from Athony Geoffroy. This showcase from Web Designer Depot.</div>
-                <div class="green__link"> <a class="green__link--link" href="#"> read more...</a></div>
-              </div>
+                <p class="green__text">Designer Edmar Cisneros has an interesting and unique philosophy regarding design that. It’s always entertaining to explore the works of a great caricature artist. This showcase from Web Designer Depot features some amazing and hilarious caricatures from Athony Geoffroy. This showcase from Web Designer Depot.</p>
+                <div class="green__link"> </div>
+              </div><a class="green__link--link" href="#"> read more...</a>
             </article>
             <aside class="aside aside-right">
               <div class="aside-right__subscrube">
@@ -352,6 +353,6 @@
       <script src="js/widgets.js"></script>
       <script src="js/functions.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-    </wrapper>
+    </div>
   </body>
 </html>

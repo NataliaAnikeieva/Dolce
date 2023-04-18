@@ -7,22 +7,35 @@ html,body {
 	font-size: $fs-sm;
 	font-family: $main-font;
 	-webkit-font-smoothing: antialiased;
+}
+body {
 	background-color: $color7;
 }
 .wrapper {
+	position: relative;
 	min-height: 100%;
     display: flex;
     flex-direction: column;
 	background: url(../img/background.jpg);
 	background-attachment: fixed;
+	&::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		height: 340px;
+		width: 100%;
+		background-color: #010101;
+	}
 }
 .content {
     flex: 1 1 auto;
+	position: relative;
+	z-index: 1;
 }
 [class*="__container"] {
     max-width: 1020px;
     margin: 0 auto; 
-	padding: 0 15px;
 }
 // header
 .header__container {
@@ -58,13 +71,16 @@ html,body {
 .header__bottom {
 	@include flex(null, null, space-between, center);
 	background-color: $color7;
-	padding: 0 10px;
+	padding: 5px 10px;
 	margin-top: 25px;
 }
 .logo {
 	&__link {
 		font-size: 36px;
 		text-transform: uppercase;
+		&:hover {
+			opacity: .8;
+		}
 	}
 }
 .nav {
@@ -97,9 +113,6 @@ html,body {
 	}
 }
 // ===main
-.main__container {
-	padding: 0;
-}
 .main__content {
 	display: flex;  
 	justify-content: space-between;
@@ -125,22 +138,32 @@ html,body {
 	width: 280px;
     display: inline-block;
     margin-left: 20px;
+	&::before {
+		content: "";
+		opacity: 0;
+		position: absolute;
+		display: inline-block;
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 7.5px 15px 7.5px 0;
+		border-color: transparent #f6f7f9 transparent transparent;
+		left: 2%;
+		margin-top: 8px;
+	}
 	&:hover {
 		background-color: $color2;
 		&::before {
-			content: "";
-			position: absolute;
-			display: inline-block;
-			width: 0;
-			height: 0;
-			border-style: solid;
-			border-width: 7.5px 15px 7.5px 0;
-			border-color: transparent #f6f7f9 transparent transparent;
-			left: 2%;
-			margin-top: 8px;
+			opacity: 1;
 		}
 	}
 }
+}
+li.slider__control:hover h2 {
+	color: $color7;
+}
+li.slider__control:hover p {
+	color: $color7;
 }
 .slider__content {
 	margin-top: 15%;
@@ -201,26 +224,61 @@ html,body {
 	border-bottom: 1px solid $color5;
 }
 // content
+
 .center {
 	display: flex;
 	flex-direction: column;
 	text-align: start;
 	width: 49.5%;
 	padding-top: 20px;
-	&__bigimg {
-		max-width: 100%;
-}
-	&__subtitle {
-		position: relative;
-		padding: 5px;
-		background-color: $bgc1;
-		top: -30px;
+	&__img--big {
+		height: 296px;
 	}
 	&__link {
-		@include transition(opacity);
+		position: relative;
+		display: block;
+		height: 100%;
 		&:hover {
-			opacity: 0.8;
+			opacity: .8;
 		}
+	}
+	&__link--bigimg {
+		height: 296px;
+		width: 100%;
+	}
+	&__img--small {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 15px;
+		margin-bottom: 15px;
+	}
+	&__subtitle {
+		position: absolute;
+		width: 100%;
+		padding: 5px;
+		background-color: $bgc1;
+		bottom: 0;
+	}
+}
+.discount {
+	position: absolute;
+	top: 40%;
+	left: 66%;
+	&__text {
+		color: $color2;
+		font-size: 46px;
+		font-family: "_officina_sans";
+		position: absolute;
+		top: 50%;
+		left: 75%;
+	}
+	&__interest {
+		color: $color2;
+		font-size: 22px;
+		font-family: "_officina_sans";
+		position: absolute;
+		top: 66%;
+		left: 79%;
 	}
 }
 .green {
@@ -242,9 +300,9 @@ html,body {
 		color: $color5;
 		&:hover {
 			text-decoration: underline;
+			}
 		}
 	}
-}
 }
 // aside-right
 .aside-right{
@@ -303,6 +361,8 @@ html,body {
 }
 // ====footer
 .footer {
+	position: relative;
+	z-index: 1;
 	&__container {
 		padding: 50px;
 		background-color: $bgc1;
@@ -377,7 +437,7 @@ html,body {
 		}
 	}
 }
-@media (max-width: 960px) {
+@media (max-width: 1000px) {
 .logo {
 	&__link {
 		font-size: $fs-xlg;
@@ -388,13 +448,18 @@ html,body {
 		font-size: $fs-md;
 	}
 }
+.slider__holder {
+	display: none;
+}
 .main__content {
 	flex-direction: column;
 	flex-wrap: wrap;
+	width: 540px;
+	margin: 0 auto;
 }
 .center {
-	order: 1;
 	width: 100%;
+	order: 1;
 }
 .left {
 	order: 3;
@@ -410,20 +475,7 @@ html,body {
 	}
 	&__logo {
 		margin-bottom: 20px;
-		order: 1;
 	}
-	&__menu {
-		order: 5;
-	}
-}
-.buttom__footer--text {
-	order: 2;
-}
-.buttom__footer--about {
-	order: 3;
-}
-.buttom__footer--subscribe {
-	order: 4;
 }
 .buttom__footer {
 	flex-direction: column;
@@ -504,4 +556,9 @@ header {
 .header__social {
 	display: none;
 }
+}
+@media (max-width: 570px) {
+	.main__content {
+		width: 80%;
+	}
 }
